@@ -47,11 +47,19 @@ export function buildApp(deps: BuildAppDeps): FastifyInstance {
 
   const availabilityCache = createAvailabilityCache(deps.env.availabilityCacheTtlSeconds);
 
-  registerPatientRoutes(app, deps.db);
-  registerDoctorRoutes(app, deps.db);
-  registerAvailabilityRoutes(app, deps.db, availabilityCache);
-  registerAppointmentRoutes(app, deps.db, availabilityCache);
-  registerPaymentRoutes(app, deps.db);
+  // Routes are registered inside a nested plugin so avvio defers their
+  // registration until after the rate-limit (and swagger) plugins above have
+  // actually run. Those plugins wire themselves up via an `onRoute` hook,
+  // which only affects routes declared *after* the hook exists; declaring
+  // routes synchronously at the top level (before the async plugins above
+  // have been booted) would silently skip rate limiting for every route.
+  void app.register(async (instance) => {
+    registerPatientRoutes(instance, deps.db);
+    registerDoctorRoutes(instance, deps.db);
+    registerAvailabilityRoutes(instance, deps.db, availabilityCache);
+    registerAppointmentRoutes(instance, deps.db, availabilityCache);
+    registerPaymentRoutes(instance, deps.db);
+  });
 
   return app;
 }

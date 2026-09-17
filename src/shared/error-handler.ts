@@ -17,6 +17,10 @@ export function registerErrorHandler(app: FastifyInstance): void {
       return reply.status(400).send({ error: 'VALIDATION_ERROR', message: 'Invalid request data' });
     }
 
+    if (error.statusCode === 429) {
+      return reply.status(429).send({ error: 'RATE_LIMIT_EXCEEDED', message: error.message });
+    }
+
     request.log.error(error);
     return reply.status(500).send({ error: 'INTERNAL_ERROR', message: 'Unexpected error' });
   });
