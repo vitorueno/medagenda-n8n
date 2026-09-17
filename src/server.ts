@@ -14,6 +14,7 @@ import { authPlugin } from './shared/auth-plugin';
 import { createAvailabilityCache } from './shared/cache/availability-cache';
 import { registerPatientRoutes } from './modules/patients/patient.routes';
 import { registerDoctorRoutes } from './modules/doctors/doctor.routes';
+import { registerAvailabilityRoutes } from './modules/availability/availability.routes';
 
 export interface BuildAppDeps {
   db: Database.Database;
@@ -43,9 +44,10 @@ export function buildApp(deps: BuildAppDeps): FastifyInstance {
   void app.register(authPlugin, { apiKey: deps.env.apiKey });
 
   const availabilityCache = createAvailabilityCache(deps.env.availabilityCacheTtlSeconds);
-  void availabilityCache;
+
   registerPatientRoutes(app, deps.db);
   registerDoctorRoutes(app, deps.db);
+  registerAvailabilityRoutes(app, deps.db, availabilityCache);
 
   return app;
 }
