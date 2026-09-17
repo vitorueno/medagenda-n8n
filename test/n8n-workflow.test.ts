@@ -12,7 +12,7 @@ interface N8nWorkflow {
   nodes: N8nNode[];
   connections: Record<
     string,
-    { main?: Array<Array<{ node: string; type: string; index: number }>> }
+    Record<string, Array<Array<{ node: string; type: string; index: number }>>>
   >;
 }
 
@@ -91,5 +91,29 @@ describe('n8n workflow structure', () => {
         }
       }
     }
+  });
+
+  it('wires the not-flagged branch into the AI Agent, with a chat model and memory attached', () => {
+    const workflow = loadWorkflow();
+    const agent = findNode(workflow, 'Assistente de Atendimento');
+    expect(agent.type).toBe('@n8n/n8n-nodes-langchain.agent');
+    findNode(workflow, 'Modelo de Chat OpenAI');
+    findNode(workflow, 'Memoria da Conversa');
+
+    expect(workflow.connections['Conteudo Sinalizado']?.main?.[1]?.[0]?.node).toBe(
+      'Assistente de Atendimento',
+    );
+
+    const modeloConnections = workflow.connections['Modelo de Chat OpenAI'] as unknown as Record<
+      string,
+      Array<Array<{ node: string; type: string }>>
+    >;
+    expect(modeloConnections.ai_languageModel[0][0].node).toBe('Assistente de Atendimento');
+
+    const memoriaConnections = workflow.connections['Memoria da Conversa'] as unknown as Record<
+      string,
+      Array<Array<{ node: string; type: string }>>
+    >;
+    expect(memoriaConnections.ai_memory[0][0].node).toBe('Assistente de Atendimento');
   });
 });
