@@ -3,6 +3,7 @@ import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 import rateLimit from '@fastify/rate-limit';
 import {
+  jsonSchemaTransform,
   serializerCompiler,
   validatorCompiler,
   type ZodTypeProvider,
@@ -35,6 +36,7 @@ export function buildApp(deps: BuildAppDeps): FastifyInstance {
 
   void app.register(swagger, {
     openapi: { info: { title: 'Essentia Medical API', version: '1.0.0' } },
+    transform: jsonSchemaTransform,
   });
   void app.register(swaggerUi, { routePrefix: '/docs' });
 
