@@ -116,4 +116,55 @@ describe('n8n workflow structure', () => {
     >;
     expect(memoriaConnections.ai_memory[0][0].node).toBe('Assistente de Atendimento');
   });
+
+  it('wires all 5 tools to the AI Agent via ai_tool connections', () => {
+    const workflow = loadWorkflow();
+    const expectedTools = [
+      'Tool - Identificar Paciente',
+      'Tool - Consultar Disponibilidade',
+      'Tool - Agendar Consulta',
+      'Tool - Cancelar Consulta',
+      'Tool - Consultar Pagamento',
+    ];
+
+    for (const toolName of expectedTools) {
+      const node = findNode(workflow, toolName);
+      expect(node.type).toBe('@n8n/n8n-nodes-langchain.toolHttpRequest');
+
+      const toolConnections = workflow.connections[toolName] as unknown as Record<
+        string,
+        Array<Array<{ node: string; type: string }>>
+      >;
+      expect(toolConnections.ai_tool[0][0].node).toBe('Assistente de Atendimento');
+    }
+  });
+
+  it('every tool sends the x-api-key header and targets the internal API base URL', () => {
+    const raw = readFileSync('n8n/workflow.json', 'utf-8');
+    const workflow = JSON.parse(raw) as {
+      nodes: Array<{ name: string; type: string; parameters: Record<string, unknown> }>;
+    };
+    const tools = workflow.nodes.filter(
+      (n) => n.type === '@n8n/n8n-nodes-langchain.toolHttpRequest',
+    );
+    expect(tools).toHaveLength(5);
+
+    for (const tool of tools) {
+      const url = tool.parameters.url as string;
+      expect(url).toContain('$env.N8N_API_BASE_URL');
+
+      // NOTE: this n8n version's @n8n/n8n-nodes-langchain.toolHttpRequest (typeVersion 1.1)
+      // reads header parameters from `parametersHeaders.values` (each entry has a
+      // `valueProvider` of 'fieldValue' | 'modelRequired' | 'modelOptional'), not from the
+      // older `headerParameters.parameters` name/value shape. Verified via real import +
+      // NDV/UI inspection and the node's compiled source (ToolHttpRequest.node.js /
+      // utils.js), which call `getNodeParameter('parametersHeaders.values', ...)`.
+      const headerParams = tool.parameters.parametersHeaders as {
+        values: Array<{ name: string; valueProvider: string; value?: string }>;
+      };
+      const apiKeyHeader = headerParams.values.find((p) => p.name === 'x-api-key');
+      expect(apiKeyHeader?.valueProvider).toBe('fieldValue');
+      expect(apiKeyHeader?.value).toBe('={{ $env.N8N_API_KEY }}');
+    }
+  });
 });

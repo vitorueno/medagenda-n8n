@@ -244,6 +244,208 @@
         "sessionKey": "={{ $json.sessionId }}",
         "contextWindowLength": 10
       }
+    },
+    {
+      "id": "tool-identificar-paciente-1",
+      "name": "Tool - Identificar Paciente",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [1780, 700],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.N8N_API_BASE_URL }}/patients/lookup",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "parametersHeaders": {
+          "values": [
+            {
+              "name": "x-api-key",
+              "valueProvider": "fieldValue",
+              "value": "={{ $env.N8N_API_KEY }}"
+            }
+          ]
+        },
+        "sendQuery": true,
+        "specifyQuery": "keypair",
+        "parametersQuery": {
+          "values": [
+            { "name": "email", "valueProvider": "modelOptional" },
+            { "name": "phone", "valueProvider": "modelOptional" }
+          ]
+        },
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "email",
+              "description": "e-mail do paciente, se informado",
+              "type": "string"
+            },
+            {
+              "name": "phone",
+              "description": "telefone do paciente, se informado",
+              "type": "string"
+            }
+          ]
+        },
+        "toolDescription": "Identifica um paciente pelo e-mail ou telefone que ele informou na conversa. Retorna id, name, email e phone. Use antes de agendar ou cancelar uma consulta."
+      }
+    },
+    {
+      "id": "tool-consultar-disponibilidade-1",
+      "name": "Tool - Consultar Disponibilidade",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [1960, 700],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.N8N_API_BASE_URL }}/availability",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "parametersHeaders": {
+          "values": [
+            {
+              "name": "x-api-key",
+              "valueProvider": "fieldValue",
+              "value": "={{ $env.N8N_API_KEY }}"
+            }
+          ]
+        },
+        "sendQuery": true,
+        "specifyQuery": "keypair",
+        "parametersQuery": {
+          "values": [
+            { "name": "date", "valueProvider": "modelRequired" },
+            { "name": "specialty", "valueProvider": "modelOptional" },
+            { "name": "doctorId", "valueProvider": "modelOptional" }
+          ]
+        },
+        "placeholderDefinitions": {
+          "values": [
+            { "name": "date", "description": "data no formato YYYY-MM-DD", "type": "string" },
+            {
+              "name": "specialty",
+              "description": "especialidade médica, se informada",
+              "type": "string"
+            },
+            { "name": "doctorId", "description": "id do médico, se informado", "type": "number" }
+          ]
+        },
+        "toolDescription": "Consulta horários disponíveis para uma data, opcionalmente filtrando por especialidade ou médico. Retorna uma lista de horários com id do slot, médico e especialidade. Nunca invente horários que não estejam nesta lista."
+      }
+    },
+    {
+      "id": "tool-agendar-consulta-1",
+      "name": "Tool - Agendar Consulta",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [2140, 700],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.N8N_API_BASE_URL }}/appointments",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "parametersHeaders": {
+          "values": [
+            {
+              "name": "x-api-key",
+              "valueProvider": "fieldValue",
+              "value": "={{ $env.N8N_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "keypair",
+        "parametersBody": {
+          "values": [
+            { "name": "patientId", "valueProvider": "modelRequired" },
+            { "name": "slotId", "valueProvider": "modelRequired" }
+          ]
+        },
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "patientId",
+              "description": "id do paciente, obtido via identificar_paciente",
+              "type": "number"
+            },
+            {
+              "name": "slotId",
+              "description": "id do horário, obtido via consultar_disponibilidade",
+              "type": "number"
+            }
+          ]
+        },
+        "toolDescription": "Cria um agendamento para um paciente em um horário específico. Só chame depois de confirmar o patientId (via identificar_paciente) e o slotId (via consultar_disponibilidade). Retorna o agendamento criado ou um erro se o horário não estiver mais disponível."
+      }
+    },
+    {
+      "id": "tool-cancelar-consulta-1",
+      "name": "Tool - Cancelar Consulta",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [2320, 700],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.N8N_API_BASE_URL }}/appointments/{appointmentId}/cancel",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "parametersHeaders": {
+          "values": [
+            {
+              "name": "x-api-key",
+              "valueProvider": "fieldValue",
+              "value": "={{ $env.N8N_API_KEY }}"
+            }
+          ]
+        },
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "appointmentId",
+              "description": "id do agendamento a cancelar",
+              "type": "number"
+            }
+          ]
+        },
+        "toolDescription": "Cancela um agendamento existente pelo seu id. Retorna o agendamento cancelado ou um erro se ele não existir ou já estiver cancelado."
+      }
+    },
+    {
+      "id": "tool-consultar-pagamento-1",
+      "name": "Tool - Consultar Pagamento",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [2500, 700],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.N8N_API_BASE_URL }}/payments",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "parametersHeaders": {
+          "values": [
+            {
+              "name": "x-api-key",
+              "valueProvider": "fieldValue",
+              "value": "={{ $env.N8N_API_KEY }}"
+            }
+          ]
+        },
+        "sendQuery": true,
+        "specifyQuery": "keypair",
+        "parametersQuery": {
+          "values": [{ "name": "consultationType", "valueProvider": "modelOptional" }]
+        },
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "consultationType",
+              "description": "tipo de consulta, se informado",
+              "type": "string"
+            }
+          ]
+        },
+        "toolDescription": "Consulta valores e formas de pagamento. Se nenhum tipo de consulta for informado, retorna todos os tipos configurados. Nunca invente preços ou formas de pagamento."
+      }
     }
   ],
   "connections": {
@@ -281,6 +483,21 @@
     },
     "Memoria da Conversa": {
       "ai_memory": [[{ "node": "Assistente de Atendimento", "type": "ai_memory", "index": 0 }]]
+    },
+    "Tool - Identificar Paciente": {
+      "ai_tool": [[{ "node": "Assistente de Atendimento", "type": "ai_tool", "index": 0 }]]
+    },
+    "Tool - Consultar Disponibilidade": {
+      "ai_tool": [[{ "node": "Assistente de Atendimento", "type": "ai_tool", "index": 0 }]]
+    },
+    "Tool - Agendar Consulta": {
+      "ai_tool": [[{ "node": "Assistente de Atendimento", "type": "ai_tool", "index": 0 }]]
+    },
+    "Tool - Cancelar Consulta": {
+      "ai_tool": [[{ "node": "Assistente de Atendimento", "type": "ai_tool", "index": 0 }]]
+    },
+    "Tool - Consultar Pagamento": {
+      "ai_tool": [[{ "node": "Assistente de Atendimento", "type": "ai_tool", "index": 0 }]]
     }
   }
 }
