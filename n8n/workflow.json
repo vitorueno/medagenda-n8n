@@ -1,0 +1,145 @@
+{
+  "id": "essentia-atendimento-medico",
+  "name": "Essentia - Atendimento Medico",
+  "nodes": [
+    {
+      "id": "chat-trigger-1",
+      "name": "Recepcao do Paciente",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [0, 300],
+      "webhookId": "essentia-atendimento-chat",
+      "parameters": {
+        "public": true,
+        "mode": "webhook",
+        "options": {
+          "responseMode": "lastNode",
+          "allowFileUploads": true
+        }
+      }
+    },
+    {
+      "id": "if-audio-texto-1",
+      "name": "Tem Audio",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [260, 300],
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "cond-tem-audio",
+              "leftValue": "={{ Object.keys($binary || {}).length > 0 }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "http-whisper-1",
+      "name": "Transcrever Audio",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [520, 180],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000,
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/audio/transcriptions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            { "name": "model", "value": "whisper-1" },
+            {
+              "name": "file",
+              "parameterType": "formBinaryData",
+              "inputDataFieldName": "={{ Object.keys($binary)[0] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-credential-placeholder",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "id": "set-normalizar-transcricao-1",
+      "name": "Normalizar Transcricao",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [780, 180],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "a1", "name": "mensagem", "type": "string", "value": "={{ $json.text }}" },
+            { "id": "a2", "name": "foiAudio", "type": "boolean", "value": true },
+            {
+              "id": "a3",
+              "name": "sessionId",
+              "type": "string",
+              "value": "={{ $('Recepcao do Paciente').item.json.sessionId }}"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "set-normalizar-texto-1",
+      "name": "Normalizar Texto",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [520, 420],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b1",
+              "name": "mensagem",
+              "type": "string",
+              "value": "={{ $('Recepcao do Paciente').item.json.chatInput }}"
+            },
+            { "id": "b2", "name": "foiAudio", "type": "boolean", "value": false },
+            {
+              "id": "b3",
+              "name": "sessionId",
+              "type": "string",
+              "value": "={{ $('Recepcao do Paciente').item.json.sessionId }}"
+            }
+          ]
+        },
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Recepcao do Paciente": {
+      "main": [[{ "node": "Tem Audio", "type": "main", "index": 0 }]]
+    },
+    "Tem Audio": {
+      "main": [
+        [{ "node": "Transcrever Audio", "type": "main", "index": 0 }],
+        [{ "node": "Normalizar Texto", "type": "main", "index": 0 }]
+      ]
+    },
+    "Transcrever Audio": {
+      "main": [[{ "node": "Normalizar Transcricao", "type": "main", "index": 0 }]]
+    }
+  }
+}
