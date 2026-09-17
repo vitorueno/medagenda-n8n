@@ -1554,7 +1554,7 @@ Add the import and registration call to `src/server.ts`:
 import { registerPatientRoutes } from './modules/patients/patient.routes';
 ```
 
-Replace the line `void availabilityCache;` with:
+Add the following line right after `void availabilityCache;` (do NOT remove that line yet — `availabilityCache` is still unused until Task 12 wires it into `registerAvailabilityRoutes`, and removing the `void` suppressor now would fail `npm run lint`):
 
 ```ts
   registerPatientRoutes(app, deps.db);
