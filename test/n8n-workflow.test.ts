@@ -167,4 +167,22 @@ describe('n8n workflow structure', () => {
       expect(apiKeyHeader?.value).toBe('={{ $env.N8N_API_KEY }}');
     }
   });
+
+  it('detects booking/cancellation from the agent output and branches to an email send node', () => {
+    const workflow = loadWorkflow();
+    findNode(workflow, 'Detectar Agendamento ou Cancelamento');
+    findNode(workflow, 'Deve Enviar Email');
+    const emailNode = findNode(workflow, 'Enviar Email de Confirmacao');
+    expect(emailNode.type).toBe('n8n-nodes-base.emailSend');
+
+    expect(workflow.connections['Assistente de Atendimento']?.main?.[0]?.[0]?.node).toBe(
+      'Detectar Agendamento ou Cancelamento',
+    );
+    expect(workflow.connections['Detectar Agendamento ou Cancelamento']?.main?.[0]?.[0]?.node).toBe(
+      'Deve Enviar Email',
+    );
+    expect(workflow.connections['Deve Enviar Email']?.main?.[0]?.[0]?.node).toBe(
+      'Enviar Email de Confirmacao',
+    );
+  });
 });

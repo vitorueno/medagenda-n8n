@@ -446,6 +446,65 @@
         },
         "toolDescription": "Consulta valores e formas de pagamento. Se nenhum tipo de consulta for informado, retorna todos os tipos configurados. Nunca invente preços ou formas de pagamento."
       }
+    },
+    {
+      "id": "code-detectar-agendamento-1",
+      "name": "Detectar Agendamento ou Cancelamento",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1820, 380],
+      "parameters": {
+        "jsCode": "const steps = $input.item.json.intermediateSteps || [];\nconst relevant = steps.find((step) => {\n  const toolName = step?.action?.tool;\n  return toolName === 'Tool - Agendar Consulta' || toolName === 'Tool - Cancelar Consulta';\n});\n\nif (!relevant) {\n  return { deveEnviarEmail: false };\n}\n\nlet observation;\ntry {\n  observation = typeof relevant.observation === 'string' ? JSON.parse(relevant.observation) : relevant.observation;\n} catch (error) {\n  return { deveEnviarEmail: false };\n}\n\nconst sucesso = observation && typeof observation.id === 'number' && observation.status;\nif (!sucesso) {\n  return { deveEnviarEmail: false };\n}\n\nconst patientStep = steps.find((step) => step?.action?.tool === 'Tool - Identificar Paciente');\nlet patientEmail = null;\nif (patientStep) {\n  try {\n    const patientObservation =\n      typeof patientStep.observation === 'string' ? JSON.parse(patientStep.observation) : patientStep.observation;\n    patientEmail = patientObservation?.email ?? null;\n  } catch (error) {\n    patientEmail = null;\n  }\n}\n\nreturn {\n  deveEnviarEmail: Boolean(sucesso && patientEmail),\n  tipoOperacao: relevant.action.tool === 'Tool - Agendar Consulta' ? 'agendamento' : 'cancelamento',\n  agendamento: { ...observation, patientEmail }\n};"
+      }
+    },
+    {
+      "id": "if-deve-enviar-email-1",
+      "name": "Deve Enviar Email",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [2060, 380],
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "cond-enviar-email",
+              "leftValue": "={{ $json.deveEnviarEmail }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "email-confirmacao-1",
+      "name": "Enviar Email de Confirmacao",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [2300, 320],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "parameters": {
+        "fromEmail": "atendimento@essentia-technologies.example",
+        "toEmail": "={{ $json.agendamento.patientEmail }}",
+        "subject": "={{ $json.tipoOperacao === 'agendamento' ? 'Confirmação de agendamento' : 'Confirmação de cancelamento' }}",
+        "emailFormat": "text",
+        "text": "={{ $json.tipoOperacao === 'agendamento' ? 'Sua consulta foi agendada com sucesso. Detalhes: ' + JSON.stringify($json.agendamento) : 'Sua consulta foi cancelada. Detalhes: ' + JSON.stringify($json.agendamento) }}",
+        "options": {}
+      },
+      "credentials": {
+        "smtp": {
+          "id": "mailpit-smtp-placeholder",
+          "name": "Mailpit SMTP"
+        }
+      }
     }
   ],
   "connections": {
@@ -498,6 +557,15 @@
     },
     "Tool - Consultar Pagamento": {
       "ai_tool": [[{ "node": "Assistente de Atendimento", "type": "ai_tool", "index": 0 }]]
+    },
+    "Assistente de Atendimento": {
+      "main": [[{ "node": "Detectar Agendamento ou Cancelamento", "type": "main", "index": 0 }]]
+    },
+    "Detectar Agendamento ou Cancelamento": {
+      "main": [[{ "node": "Deve Enviar Email", "type": "main", "index": 0 }]]
+    },
+    "Deve Enviar Email": {
+      "main": [[{ "node": "Enviar Email de Confirmacao", "type": "main", "index": 0 }], []]
     }
   }
 }
