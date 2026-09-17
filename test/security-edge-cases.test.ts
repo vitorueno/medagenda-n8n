@@ -67,6 +67,32 @@ describe('security and edge cases', () => {
     await app.close();
   });
 
+  it('rejects a boolean patientId instead of silently coercing it to a number', async () => {
+    const { app, seed, env } = buildTestApp();
+    const response = await app.inject({
+      method: 'POST',
+      url: '/appointments',
+      headers: authHeaders(env),
+      payload: { patientId: true, slotId: seed.slotIds[0] },
+    });
+
+    expect(response.statusCode).toBe(400);
+    await app.close();
+  });
+
+  it('rejects an array patientId instead of silently coercing it to a number', async () => {
+    const { app, seed, env } = buildTestApp();
+    const response = await app.inject({
+      method: 'POST',
+      url: '/appointments',
+      headers: authHeaders(env),
+      payload: { patientId: [1], slotId: seed.slotIds[0] },
+    });
+
+    expect(response.statusCode).toBe(400);
+    await app.close();
+  });
+
   it('never leaks internal error details to the client', async () => {
     const { app, env } = buildTestApp();
     const response = await app.inject({

@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 export const createAppointmentBodySchema = z
   .object({
-    patientId: z.coerce.number().int().positive(),
-    slotId: z.coerce.number().int().positive(),
+    patientId: z.number().int().positive(),
+    slotId: z.number().int().positive(),
   })
   .strict();
 
