@@ -1,0 +1,159 @@
+{
+  "info": {
+    "name": "Essentia Medical API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "apiKey", "value": "replace-with-your-api-key" },
+    { "key": "patientId", "value": "1" },
+    { "key": "doctorId", "value": "1" },
+    { "key": "slotId", "value": "1" },
+    { "key": "appointmentId", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "Lookup patient by email",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "x-api-key", "value": "{{apiKey}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/patients/lookup?email=ana.souza@example.com",
+          "host": ["{{baseUrl}}"],
+          "path": ["patients", "lookup"],
+          "query": [{ "key": "email", "value": "ana.souza@example.com" }]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status is 200', () => pm.response.to.have.status(200));",
+              "pm.test('has id', () => pm.expect(pm.response.json()).to.have.property('id'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "List doctors",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "x-api-key", "value": "{{apiKey}}" }],
+        "url": { "raw": "{{baseUrl}}/doctors", "host": ["{{baseUrl}}"], "path": ["doctors"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": { "exec": ["pm.test('status is 200', () => pm.response.to.have.status(200));"] }
+        }
+      ]
+    },
+    {
+      "name": "Get availability",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "x-api-key", "value": "{{apiKey}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/availability?date=2026-09-20",
+          "host": ["{{baseUrl}}"],
+          "path": ["availability"],
+          "query": [{ "key": "date", "value": "2026-09-20" }]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": { "exec": ["pm.test('status is 200', () => pm.response.to.have.status(200));"] }
+        }
+      ]
+    },
+    {
+      "name": "Create appointment",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "x-api-key", "value": "{{apiKey}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"patientId\": {{patientId}},\n  \"slotId\": {{slotId}}\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/appointments",
+          "host": ["{{baseUrl}}"],
+          "path": ["appointments"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status is 201', () => pm.response.to.have.status(201));",
+              "const body = pm.response.json();",
+              "pm.collectionVariables.set('appointmentId', body.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get appointment",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "x-api-key", "value": "{{apiKey}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/appointments/{{appointmentId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["appointments", "{{appointmentId}}"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": { "exec": ["pm.test('status is 200', () => pm.response.to.have.status(200));"] }
+        }
+      ]
+    },
+    {
+      "name": "Cancel appointment",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "x-api-key", "value": "{{apiKey}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/appointments/{{appointmentId}}/cancel",
+          "host": ["{{baseUrl}}"],
+          "path": ["appointments", "{{appointmentId}}", "cancel"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status is 200', () => pm.response.to.have.status(200));",
+              "pm.test('status is cancelled', () => pm.expect(pm.response.json().status).to.eql('cancelled'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "List payments",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "x-api-key", "value": "{{apiKey}}" }],
+        "url": { "raw": "{{baseUrl}}/payments", "host": ["{{baseUrl}}"], "path": ["payments"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": { "exec": ["pm.test('status is 200', () => pm.response.to.have.status(200));"] }
+        }
+      ]
+    }
+  ]
+}
