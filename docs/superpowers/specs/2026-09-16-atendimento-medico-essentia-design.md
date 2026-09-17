@@ -6,8 +6,10 @@ Simular um fluxo de atendimento médico automatizado via chat (texto e áudio), 
 
 ## Stack
 
-- API: TypeScript + Fastify + Zod (validação de fronteira) + SQLite (better-sqlite3 ou driver equivalente).
+- API: TypeScript (`strict: true`) + Fastify + Zod (validação de fronteira) + SQLite via **better-sqlite3** (sem ORM; ver justificativa em "Convenções de código e qualidade").
 - Testes: Vitest.
+- Lint/formatação: ESLint + Prettier.
+- Git hooks: Husky + lint-staged (pre-commit) + commitlint (commit-msg, Conventional Commits).
 - Documentação de API: Swagger (`@fastify/swagger` + `@fastify/swagger-ui`).
 - Coleção de requisições: Postman.
 - Orquestração/IA: N8N (AI Agent node, OpenAI Chat Model, Memory node, Tool nodes).
@@ -15,6 +17,18 @@ Simular um fluxo de atendimento médico automatizado via chat (texto e áudio), 
 - TTS: OpenAI TTS (via HTTP Request da API de speech da OpenAI).
 - E-mail: Gmail node do N8N (demo) / SMTP node contra Mailpit (dev e testes locais).
 - Infra: Docker Compose (api, n8n, mailpit).
+
+## Convenções de código e qualidade
+
+- **TypeScript em modo `strict`** (`tsconfig.json` com `strict: true`, sem `any` implícito).
+- **Idioma**: código (nomes de arquivos, variáveis, funções, tipos, mensagens de commit) em inglês; documentação voltada a humanos (README, este spec, comentários quando necessários) em português.
+- **Comentários**: por padrão, nenhum. Só adicionar quando o "porquê" não é óbvio pelo código (uma decisão não intuitiva, um workaround específico); nunca blocos longos de comentário ou explicação do "o quê" quando o nome já diz isso.
+- **Legibilidade acima de desempenho extremo**, sem abrir mão de uma solução razoavelmente eficiente (evitar N+1 óbvio, loops desnecessários); clean code desde o primeiro commit, não como retrabalho posterior.
+- **SQLite sem ORM, via better-sqlite3**: API síncrona já construída sobre `.prepare()`, o que dá prepared statements "de graça" e mantém a camada de repository simples e direta. Um ORM adicionaria uma camada de abstração redundante, já que todo SQL já fica isolado no repository.
+- **Nunca concatenar valores em queries SQL.** Toda query usa prepared statements com parâmetros bind (`?`), inclusive em filtros dinâmicos (montar a lista de parâmetros, nunca interpolar string na query). Isso vale tanto para código de produção quanto para scripts de seed/migração.
+- **Commits em Conventional Commits, em inglês** (`feat:`, `fix:`, `chore:`, `test:`, `docs:`, etc.), validados por commitlint no hook `commit-msg`.
+- **Pre-commit hook (Husky + lint-staged)** bloqueia o commit se: lint falhar, formatação estiver incorreta, ou os testes não passarem. Nenhum código quebrado, mal formatado ou sem lint deve chegar a ser commitado.
+- **Segurança como princípio transversal, não uma seção isolada**: toda validação de entrada (Zod), toda query (prepared statement), toda resposta de erro (sem vazar detalhes internos) e toda decisão de fronteira API/N8N deve ser pensada assumindo que a entrada pode ser adversarial, não só assumindo o caminho feliz.
 
 ## Princípio arquitetural central
 
@@ -62,7 +76,7 @@ rota (schema Zod de entrada/saída) -> controller (só parsing/HTTP, chama 1 mé
 
 - **Controller nunca contém lógica de negócio.** Sua única responsabilidade é: receber a requisição já validada pelo schema Zod, chamar o método correspondente do service, mapear o retorno/erro do service para status HTTP e corpo de resposta.
 - **Toda regra de negócio vive no service** (checar conflito de slot, checar existência, decidir status HTTP semântico via erros tipados, aplicar cache de disponibilidade e sua invalidação).
-- **Repository é a única camada que acessa o SQLite diretamente.** Não há SQL fora dela.
+- **Repository é a única camada que acessa o SQLite diretamente.** Não há SQL fora dela, e toda query usa prepared statements com parâmetros bind, nunca concatenação de string.
 - Erros de negócio são exceções tipadas (ex.: `SlotNotFoundError`, `SlotAlreadyBookedError`, `AppointmentNotFoundError`, `AppointmentAlreadyCancelledError`) lançadas no service e traduzidas para status HTTP num único lugar (error handler do Fastify), nunca com `if` de status espalhado pelos controllers.
 
 ## Endpoints mínimos
