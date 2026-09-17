@@ -83,7 +83,7 @@ rota (schema Zod de entrada/saída) -> controller (só parsing/HTTP, chama 1 mé
 
 - `GET /patients/lookup?email=` ou `?phone=` — identificar paciente (usado antes de agendar/cancelar).
 - `GET /doctors`
-- `GET /doctors/:id/availability?date=YYYY-MM-DD`
+- `GET /availability?date=YYYY-MM-DD&specialty=&doctorId=` (`specialty` e `doctorId` opcionais e combináveis, permitindo tanto busca geral por data/especialidade quanto filtrada por médico específico, alinhado 1:1 com os parâmetros da tool `consultar_disponibilidade`)
 - `POST /appointments` (`{ patientId, slotId }`)
 - `GET /appointments/:id`
 - `POST /appointments/:id/cancel` (endpoint explícito, mais claro para auditoria que DELETE)
