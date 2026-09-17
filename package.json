@@ -2,7 +2,7 @@
   "name": "essentia-medical-api",
   "version": "1.0.0",
   "private": true,
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",

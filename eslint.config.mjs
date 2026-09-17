@@ -7,7 +7,7 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
   prettier,
   {
-    ignores: ['dist/**', 'node_modules/**', '*.config.js', '*.config.cjs'],
+    ignores: ['dist/**', 'node_modules/**', '*.config.js', '*.config.cjs', '*.config.mjs'],
   },
   {
     languageOptions: {
@@ -18,9 +18,5 @@ export default tseslint.config(
     rules: {
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     },
-  },
-  {
-    files: ['**/*.config.js', '**/*.config.cjs'],
-    languageOptions: {},
   },
 );
