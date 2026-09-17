@@ -16,6 +16,7 @@ import { registerPatientRoutes } from './modules/patients/patient.routes';
 import { registerDoctorRoutes } from './modules/doctors/doctor.routes';
 import { registerAvailabilityRoutes } from './modules/availability/availability.routes';
 import { registerAppointmentRoutes } from './modules/appointments/appointment.routes';
+import { registerPaymentRoutes } from './modules/payments/payment.routes';
 
 export interface BuildAppDeps {
   db: Database.Database;
@@ -50,6 +51,7 @@ export function buildApp(deps: BuildAppDeps): FastifyInstance {
   registerDoctorRoutes(app, deps.db);
   registerAvailabilityRoutes(app, deps.db, availabilityCache);
   registerAppointmentRoutes(app, deps.db, availabilityCache);
+  registerPaymentRoutes(app, deps.db);
 
   return app;
 }
