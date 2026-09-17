@@ -126,6 +126,80 @@
         },
         "options": {}
       }
+    },
+    {
+      "id": "http-moderation-1",
+      "name": "Moderar Conteudo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1040, 300],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000,
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/moderations",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "keypair",
+        "bodyParameters": {
+          "parameters": [{ "name": "input", "value": "={{ $json.mensagem }}" }]
+        },
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-credential-placeholder",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "id": "if-conteudo-sinalizado-1",
+      "name": "Conteudo Sinalizado",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [1300, 300],
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "cond-flagged",
+              "leftValue": "={{ $json.results[0].flagged }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "set-recusa-padrao-1",
+      "name": "Resposta Padrao de Recusa",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1560, 220],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c1",
+              "name": "output",
+              "type": "string",
+              "value": "Desculpe, não posso processar essa mensagem. Se precisar de ajuda com consultas, agendamentos ou pagamentos, estou à disposição."
+            }
+          ]
+        },
+        "options": {}
+      }
     }
   ],
   "connections": {
@@ -140,6 +214,18 @@
     },
     "Transcrever Audio": {
       "main": [[{ "node": "Normalizar Transcricao", "type": "main", "index": 0 }]]
+    },
+    "Normalizar Transcricao": {
+      "main": [[{ "node": "Moderar Conteudo", "type": "main", "index": 0 }]]
+    },
+    "Normalizar Texto": {
+      "main": [[{ "node": "Moderar Conteudo", "type": "main", "index": 0 }]]
+    },
+    "Moderar Conteudo": {
+      "main": [[{ "node": "Conteudo Sinalizado", "type": "main", "index": 0 }]]
+    },
+    "Conteudo Sinalizado": {
+      "main": [[{ "node": "Resposta Padrao de Recusa", "type": "main", "index": 0 }], []]
     }
   }
 }

@@ -62,6 +62,24 @@ describe('n8n workflow structure', () => {
     expect(textBranch).toBe('Normalizar Texto');
   });
 
+  it('routes both normalized message paths into moderation, and moderation into a flagged/not-flagged branch', () => {
+    const workflow = loadWorkflow();
+    findNode(workflow, 'Moderar Conteudo');
+    findNode(workflow, 'Conteudo Sinalizado');
+    findNode(workflow, 'Resposta Padrao de Recusa');
+
+    expect(workflow.connections['Normalizar Texto']?.main?.[0]?.[0]?.node).toBe('Moderar Conteudo');
+    expect(workflow.connections['Normalizar Transcricao']?.main?.[0]?.[0]?.node).toBe(
+      'Moderar Conteudo',
+    );
+    expect(workflow.connections['Moderar Conteudo']?.main?.[0]?.[0]?.node).toBe(
+      'Conteudo Sinalizado',
+    );
+    expect(workflow.connections['Conteudo Sinalizado']?.main?.[0]?.[0]?.node).toBe(
+      'Resposta Padrao de Recusa',
+    );
+  });
+
   it('every connection target references a node that actually exists', () => {
     const workflow = loadWorkflow();
     const nodeNames = new Set(workflow.nodes.map((n) => n.name));
