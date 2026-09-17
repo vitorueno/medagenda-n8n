@@ -1,9 +1,9 @@
-import type { FastifyInstance } from 'fastify';
+import type { FastifyError, FastifyInstance } from 'fastify';
 import { ZodError } from 'zod';
 import { DomainError } from './errors';
 
 export function registerErrorHandler(app: FastifyInstance): void {
-  app.setErrorHandler((error, request, reply) => {
+  app.setErrorHandler((error: FastifyError, request, reply) => {
     if (error instanceof DomainError) {
       return reply.status(error.statusCode).send({ error: error.code, message: error.message });
     }
