@@ -12,6 +12,7 @@ import type { Env } from './env';
 import { registerErrorHandler } from './shared/error-handler';
 import { authPlugin } from './shared/auth-plugin';
 import { createAvailabilityCache } from './shared/cache/availability-cache';
+import { registerPatientRoutes } from './modules/patients/patient.routes';
 
 export interface BuildAppDeps {
   db: Database.Database;
@@ -42,6 +43,7 @@ export function buildApp(deps: BuildAppDeps): FastifyInstance {
 
   const availabilityCache = createAvailabilityCache(deps.env.availabilityCacheTtlSeconds);
   void availabilityCache;
+  registerPatientRoutes(app, deps.db);
 
   return app;
 }
