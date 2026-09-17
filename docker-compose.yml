@@ -1,0 +1,17 @@
+services:
+  api:
+    build: .
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env
+    volumes:
+      - api-data:/app/data
+    healthcheck:
+      test: ['CMD', 'wget', '--spider', '-q', 'http://127.0.0.1:3000/health']
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  api-data:
