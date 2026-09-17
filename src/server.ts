@@ -13,6 +13,7 @@ import { registerErrorHandler } from './shared/error-handler';
 import { authPlugin } from './shared/auth-plugin';
 import { createAvailabilityCache } from './shared/cache/availability-cache';
 import { registerPatientRoutes } from './modules/patients/patient.routes';
+import { registerDoctorRoutes } from './modules/doctors/doctor.routes';
 
 export interface BuildAppDeps {
   db: Database.Database;
@@ -44,6 +45,7 @@ export function buildApp(deps: BuildAppDeps): FastifyInstance {
   const availabilityCache = createAvailabilityCache(deps.env.availabilityCacheTtlSeconds);
   void availabilityCache;
   registerPatientRoutes(app, deps.db);
+  registerDoctorRoutes(app, deps.db);
 
   return app;
 }
