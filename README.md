@@ -13,7 +13,7 @@ IA consumindo esta API via HTTP com header `x-api-key`.
 
 ## Pré-requisitos
 
-- Node.js 20+
+- Node.js 22+
 - Docker e Docker Compose (opcional, para rodar containerizado)
 
 ## Configuração
