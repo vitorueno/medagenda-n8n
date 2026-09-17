@@ -35,7 +35,19 @@ export function buildApp(deps: BuildAppDeps): FastifyInstance {
   app.get('/health', async () => ({ status: 'ok' }));
 
   void app.register(swagger, {
-    openapi: { info: { title: 'Essentia Medical API', version: '1.0.0' } },
+    openapi: {
+      info: { title: 'Essentia Medical API', version: '1.0.0' },
+      components: {
+        securitySchemes: {
+          apiKey: {
+            type: 'apiKey',
+            name: 'x-api-key',
+            in: 'header',
+          },
+        },
+      },
+      security: [{ apiKey: [] }],
+    },
     transform: jsonSchemaTransform,
   });
   void app.register(swaggerUi, { routePrefix: '/docs' });
