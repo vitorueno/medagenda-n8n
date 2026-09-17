@@ -505,6 +505,70 @@
           "name": "Mailpit SMTP"
         }
       }
+    },
+    {
+      "id": "if-precisa-audio-1",
+      "name": "Precisa de Audio na Resposta",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [2540, 380],
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "cond-precisa-audio",
+              "leftValue": "={{ $('Normalizar Transcricao').item?.json?.foiAudio ?? $('Normalizar Texto').item?.json?.foiAudio ?? false }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "http-tts-1",
+      "name": "Sintetizar Audio de Resposta",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2780, 320],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000,
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/audio/speech",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "keypair",
+        "bodyParameters": {
+          "parameters": [
+            { "name": "model", "value": "tts-1" },
+            { "name": "voice", "value": "alloy" },
+            { "name": "input", "value": "={{ $('Assistente de Atendimento').item.json.output }}" }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-credential-placeholder",
+          "name": "OpenAI account"
+        }
+      }
     }
   ],
   "connections": {
@@ -565,7 +629,16 @@
       "main": [[{ "node": "Deve Enviar Email", "type": "main", "index": 0 }]]
     },
     "Deve Enviar Email": {
-      "main": [[{ "node": "Enviar Email de Confirmacao", "type": "main", "index": 0 }], []]
+      "main": [
+        [
+          { "node": "Enviar Email de Confirmacao", "type": "main", "index": 0 },
+          { "node": "Precisa de Audio na Resposta", "type": "main", "index": 0 }
+        ],
+        [{ "node": "Precisa de Audio na Resposta", "type": "main", "index": 0 }]
+      ]
+    },
+    "Precisa de Audio na Resposta": {
+      "main": [[{ "node": "Sintetizar Audio de Resposta", "type": "main", "index": 0 }], []]
     }
   }
 }

@@ -185,4 +185,42 @@ describe('n8n workflow structure', () => {
       'Enviar Email de Confirmacao',
     );
   });
+
+  it('branches to text-to-speech only when the original message was audio', () => {
+    const workflow = loadWorkflow();
+    findNode(workflow, 'Precisa de Audio na Resposta');
+    const tts = findNode(workflow, 'Sintetizar Audio de Resposta');
+    expect(tts.type).toBe('n8n-nodes-base.httpRequest');
+
+    expect(workflow.connections['Precisa de Audio na Resposta']?.main?.[0]?.[0]?.node).toBe(
+      'Sintetizar Audio de Resposta',
+    );
+  });
+
+  it('reaches the audio-response check from both the email-sent and no-email-needed paths', () => {
+    const workflow = loadWorkflow();
+    const branches = workflow.connections['Deve Enviar Email']?.main ?? [];
+    const targetsPerBranch = branches.map((branch) => branch.map((c) => c.node));
+    expect(targetsPerBranch[0]).toContain('Precisa de Audio na Resposta');
+    expect(targetsPerBranch[1]).toContain('Precisa de Audio na Resposta');
+  });
+
+  it('configures native retry on every node that calls an external service (OpenAI, SMTP)', () => {
+    const raw = readFileSync('n8n/workflow.json', 'utf-8');
+    const workflow = JSON.parse(raw) as {
+      nodes: Array<{ name: string; retryOnFail?: boolean; maxTries?: number }>;
+    };
+    const externalCallNodes = [
+      'Transcrever Audio',
+      'Moderar Conteudo',
+      'Enviar Email de Confirmacao',
+      'Sintetizar Audio de Resposta',
+    ];
+
+    for (const name of externalCallNodes) {
+      const node = workflow.nodes.find((n) => n.name === name);
+      expect(node?.retryOnFail).toBe(true);
+      expect(node?.maxTries).toBeGreaterThanOrEqual(2);
+    }
+  });
 });
