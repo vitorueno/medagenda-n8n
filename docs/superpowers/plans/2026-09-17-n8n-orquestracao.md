@@ -1274,7 +1274,7 @@ Add to `nodes`:
 }
 ```
 
-Add to `connections`. This branches off `Deve Enviar Email`'s SECOND output (index 1 — the "no email needed" path from Task 6) so the audio-response check always runs regardless of whether an email was sent, then also feeds the "yes email was sent" path back into the same check (both paths must reconverge into the audio-response decision):
+This REPLACES Task 6's existing `"Deve Enviar Email"` entry in `connections` — edit that existing key in place, don't add a second `"Deve Enviar Email"` key. It branches off `Deve Enviar Email`'s SECOND output (index 1 — the "no email needed" path from Task 6) so the audio-response check always runs regardless of whether an email was sent, then also feeds the "yes email was sent" path back into the same check (both paths must reconverge into the audio-response decision):
 
 ```json
 "Deve Enviar Email": {
