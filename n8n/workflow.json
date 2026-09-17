@@ -202,6 +202,38 @@
       }
     },
     {
+      "id": "set-restaurar-contexto-1",
+      "name": "Restaurar Contexto",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1560, 460],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e1",
+              "name": "mensagem",
+              "type": "string",
+              "value": "={{ $('Normalizar Transcricao').isExecuted ? $('Normalizar Transcricao').item.json.mensagem : $('Normalizar Texto').item.json.mensagem }}"
+            },
+            {
+              "id": "e2",
+              "name": "sessionId",
+              "type": "string",
+              "value": "={{ $('Normalizar Transcricao').isExecuted ? $('Normalizar Transcricao').item.json.sessionId : $('Normalizar Texto').item.json.sessionId }}"
+            },
+            {
+              "id": "e3",
+              "name": "foiAudio",
+              "type": "boolean",
+              "value": "={{ $('Normalizar Transcricao').isExecuted ? $('Normalizar Transcricao').item.json.foiAudio : $('Normalizar Texto').item.json.foiAudio }}"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
       "id": "agent-atendimento-1",
       "name": "Assistente de Atendimento",
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -454,7 +486,7 @@
       "typeVersion": 2,
       "position": [1820, 380],
       "parameters": {
-        "jsCode": "const steps = $input.item.json.intermediateSteps || [];\nconst relevant = steps.find((step) => {\n  const toolName = step?.action?.tool;\n  return toolName === 'Tool - Agendar Consulta' || toolName === 'Tool - Cancelar Consulta';\n});\n\nif (!relevant) {\n  return { deveEnviarEmail: false };\n}\n\nlet observation;\ntry {\n  observation = typeof relevant.observation === 'string' ? JSON.parse(relevant.observation) : relevant.observation;\n} catch (error) {\n  return { deveEnviarEmail: false };\n}\n\nconst sucesso = observation && typeof observation.id === 'number' && observation.status;\nif (!sucesso) {\n  return { deveEnviarEmail: false };\n}\n\nconst patientStep = steps.find((step) => step?.action?.tool === 'Tool - Identificar Paciente');\nlet patientEmail = null;\nif (patientStep) {\n  try {\n    const patientObservation =\n      typeof patientStep.observation === 'string' ? JSON.parse(patientStep.observation) : patientStep.observation;\n    patientEmail = patientObservation?.email ?? null;\n  } catch (error) {\n    patientEmail = null;\n  }\n}\n\nreturn {\n  deveEnviarEmail: Boolean(sucesso && patientEmail),\n  tipoOperacao: relevant.action.tool === 'Tool - Agendar Consulta' ? 'agendamento' : 'cancelamento',\n  agendamento: { ...observation, patientEmail }\n};"
+        "jsCode": "function sanitizeToolName(name) {\n  return String(name ?? '').replace(/[^a-zA-Z0-9_-]+/g, '_');\n}\n\nconst steps = $input.item.json.intermediateSteps || [];\nconst relevant = steps.find((step) => {\n  const toolName = sanitizeToolName(step?.action?.tool);\n  return toolName === sanitizeToolName('Tool - Agendar Consulta') || toolName === sanitizeToolName('Tool - Cancelar Consulta');\n});\n\nif (!relevant) {\n  return { deveEnviarEmail: false };\n}\n\nlet observation;\ntry {\n  observation = typeof relevant.observation === 'string' ? JSON.parse(relevant.observation) : relevant.observation;\n} catch (error) {\n  return { deveEnviarEmail: false };\n}\n\nconst sucesso = observation && typeof observation.id === 'number' && observation.status;\nif (!sucesso) {\n  return { deveEnviarEmail: false };\n}\n\nconst patientStep = steps.find((step) => sanitizeToolName(step?.action?.tool) === sanitizeToolName('Tool - Identificar Paciente'));\nlet patientEmail = null;\nif (patientStep) {\n  try {\n    const patientObservation =\n      typeof patientStep.observation === 'string' ? JSON.parse(patientStep.observation) : patientStep.observation;\n    patientEmail = patientObservation?.email ?? null;\n  } catch (error) {\n    patientEmail = null;\n  }\n}\n\nreturn {\n  deveEnviarEmail: Boolean(sucesso && patientEmail),\n  tipoOperacao: sanitizeToolName(relevant.action.tool) === sanitizeToolName('Tool - Agendar Consulta') ? 'agendamento' : 'cancelamento',\n  agendamento: { ...observation, patientEmail }\n};"
       }
     },
     {
@@ -518,7 +550,7 @@
           "conditions": [
             {
               "id": "cond-precisa-audio",
-              "leftValue": "={{ $('Normalizar Transcricao').item?.json?.foiAudio ?? $('Normalizar Texto').item?.json?.foiAudio ?? false }}",
+              "leftValue": "={{ $('Normalizar Transcricao').isExecuted ? $('Normalizar Transcricao').item.json.foiAudio : $('Normalizar Texto').item.json.foiAudio }}",
               "rightValue": true,
               "operator": {
                 "type": "boolean",
@@ -569,6 +601,26 @@
           "name": "OpenAI account"
         }
       }
+    },
+    {
+      "id": "set-formatar-resposta-texto-1",
+      "name": "Formatar Resposta Texto",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [2780, 440],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d1",
+              "name": "output",
+              "type": "string",
+              "value": "={{ $('Assistente de Atendimento').item.json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      }
     }
   ],
   "connections": {
@@ -596,8 +648,11 @@
     "Conteudo Sinalizado": {
       "main": [
         [{ "node": "Resposta Padrao de Recusa", "type": "main", "index": 0 }],
-        [{ "node": "Assistente de Atendimento", "type": "main", "index": 0 }]
+        [{ "node": "Restaurar Contexto", "type": "main", "index": 0 }]
       ]
+    },
+    "Restaurar Contexto": {
+      "main": [[{ "node": "Assistente de Atendimento", "type": "main", "index": 0 }]]
     },
     "Modelo de Chat OpenAI": {
       "ai_languageModel": [
@@ -623,22 +678,24 @@
       "ai_tool": [[{ "node": "Assistente de Atendimento", "type": "ai_tool", "index": 0 }]]
     },
     "Assistente de Atendimento": {
-      "main": [[{ "node": "Detectar Agendamento ou Cancelamento", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          { "node": "Detectar Agendamento ou Cancelamento", "type": "main", "index": 0 },
+          { "node": "Precisa de Audio na Resposta", "type": "main", "index": 0 }
+        ]
+      ]
     },
     "Detectar Agendamento ou Cancelamento": {
       "main": [[{ "node": "Deve Enviar Email", "type": "main", "index": 0 }]]
     },
     "Deve Enviar Email": {
-      "main": [
-        [
-          { "node": "Enviar Email de Confirmacao", "type": "main", "index": 0 },
-          { "node": "Precisa de Audio na Resposta", "type": "main", "index": 0 }
-        ],
-        [{ "node": "Precisa de Audio na Resposta", "type": "main", "index": 0 }]
-      ]
+      "main": [[{ "node": "Enviar Email de Confirmacao", "type": "main", "index": 0 }], []]
     },
     "Precisa de Audio na Resposta": {
-      "main": [[{ "node": "Sintetizar Audio de Resposta", "type": "main", "index": 0 }], []]
+      "main": [
+        [{ "node": "Sintetizar Audio de Resposta", "type": "main", "index": 0 }],
+        [{ "node": "Formatar Resposta Texto", "type": "main", "index": 0 }]
+      ]
     }
   }
 }

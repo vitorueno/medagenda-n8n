@@ -101,6 +101,9 @@ describe('n8n workflow structure', () => {
     findNode(workflow, 'Memoria da Conversa');
 
     expect(workflow.connections['Conteudo Sinalizado']?.main?.[1]?.[0]?.node).toBe(
+      'Restaurar Contexto',
+    );
+    expect(workflow.connections['Restaurar Contexto']?.main?.[0]?.[0]?.node).toBe(
       'Assistente de Atendimento',
     );
 
@@ -197,12 +200,63 @@ describe('n8n workflow structure', () => {
     );
   });
 
-  it('reaches the audio-response check from both the email-sent and no-email-needed paths', () => {
+  it('restores mensagem/sessionId/foiAudio after moderation destroys the item shape', () => {
+    const workflow = loadWorkflow();
+    const restaurar = findNode(workflow, 'Restaurar Contexto');
+    expect(restaurar.type).toBe('n8n-nodes-base.set');
+    expect(workflow.connections['Conteudo Sinalizado']?.main?.[1]?.[0]?.node).toBe(
+      'Restaurar Contexto',
+    );
+    expect(workflow.connections['Restaurar Contexto']?.main?.[0]?.[0]?.node).toBe(
+      'Assistente de Atendimento',
+    );
+  });
+
+  it('fans the Agent output out to independent parallel side-effect and reply chains', () => {
+    const workflow = loadWorkflow();
+    const agentTargets =
+      workflow.connections['Assistente de Atendimento']?.main?.[0]?.map((c) => c.node) ?? [];
+    expect(agentTargets).toContain('Detectar Agendamento ou Cancelamento');
+    expect(agentTargets).toContain('Precisa de Audio na Resposta');
+  });
+
+  it('keeps the email side-effect chain as a true dead end, not feeding the reply chain', () => {
     const workflow = loadWorkflow();
     const branches = workflow.connections['Deve Enviar Email']?.main ?? [];
     const targetsPerBranch = branches.map((branch) => branch.map((c) => c.node));
-    expect(targetsPerBranch[0]).toContain('Precisa de Audio na Resposta');
-    expect(targetsPerBranch[1]).toContain('Precisa de Audio na Resposta');
+    expect(targetsPerBranch[0]).toEqual(['Enviar Email de Confirmacao']);
+    expect(targetsPerBranch[1]).toEqual([]);
+  });
+
+  it('formats a text reply directly from the Agent output when no audio is needed', () => {
+    const workflow = loadWorkflow();
+    const formatar = findNode(workflow, 'Formatar Resposta Texto');
+    expect(formatar.type).toBe('n8n-nodes-base.set');
+    expect(workflow.connections['Precisa de Audio na Resposta']?.main?.[1]?.[0]?.node).toBe(
+      'Formatar Resposta Texto',
+    );
+  });
+
+  it('sanitizes tool names before comparing them in the booking-detection code node', () => {
+    const raw = readFileSync('n8n/workflow.json', 'utf-8');
+    const workflow = JSON.parse(raw) as {
+      nodes: Array<{ name: string; parameters: Record<string, unknown> }>;
+    };
+    const codeNode = workflow.nodes.find((n) => n.name === 'Detectar Agendamento ou Cancelamento');
+    const jsCode = codeNode?.parameters.jsCode as string;
+    expect(jsCode).toContain('replace(/[^a-zA-Z0-9_-]+/g');
+    expect(jsCode).not.toContain("=== 'Tool - Agendar Consulta'");
+  });
+
+  it('guards cross-node expressions with isExecuted instead of relying on optional chaining alone', () => {
+    const raw = readFileSync('n8n/workflow.json', 'utf-8');
+    const workflow = JSON.parse(raw) as {
+      nodes: Array<{ name: string; parameters: Record<string, unknown> }>;
+    };
+    const precisaAudio = workflow.nodes.find((n) => n.name === 'Precisa de Audio na Resposta');
+    const condition = JSON.stringify(precisaAudio?.parameters);
+    expect(condition).toContain('.isExecuted');
+    expect(condition).not.toContain('.item?.json?.foiAudio');
   });
 
   it('configures native retry on every node that calls an external service (OpenAI, SMTP)', () => {
