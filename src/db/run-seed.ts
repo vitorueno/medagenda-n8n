@@ -7,7 +7,16 @@ import { seedDatabase } from './seed';
 const env = loadEnv(process.env);
 const db = createDatabase(env.databasePath);
 migrate(db);
-seedDatabase(db);
-db.close();
 
-console.log(`Seeded database at ${env.databasePath}`);
+const { count } = db.prepare('SELECT COUNT(*) as count FROM patients').get() as {
+  count: number;
+};
+
+if (count === 0) {
+  seedDatabase(db);
+  console.log(`Seeded database at ${env.databasePath}`);
+} else {
+  console.log(`Database at ${env.databasePath} already has data, skipping seed`);
+}
+
+db.close();

@@ -123,11 +123,11 @@ describe('n8n workflow structure', () => {
   it('wires all 5 tools to the AI Agent via ai_tool connections', () => {
     const workflow = loadWorkflow();
     const expectedTools = [
-      'Tool - Identificar Paciente',
-      'Tool - Consultar Disponibilidade',
-      'Tool - Agendar Consulta',
-      'Tool - Cancelar Consulta',
-      'Tool - Consultar Pagamento',
+      'identificar_paciente',
+      'consultar_disponibilidade',
+      'agendar_consulta',
+      'cancelar_consulta',
+      'consultar_pagamento',
     ];
 
     for (const toolName of expectedTools) {

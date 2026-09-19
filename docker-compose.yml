@@ -1,6 +1,7 @@
 services:
   api:
     build: .
+    command: sh -c "npm run seed && node dist/index.js"
     ports:
       - '3000:3000'
     env_file:
@@ -27,6 +28,7 @@ services:
       - N8N_API_BASE_URL=http://api:3000
       - N8N_API_KEY=${API_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
     volumes:
       - n8n-data:/home/node/.n8n
       - ./n8n:/workflows
@@ -42,7 +44,7 @@ services:
   mailpit:
     image: axllent/mailpit:latest
     ports:
-      - '8025:8025'
+      - '8080:8025'
       - '1025:1025'
 
 volumes:
