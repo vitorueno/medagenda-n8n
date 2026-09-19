@@ -1,6 +1,6 @@
 # Assistente de Agendamento Médico
 
-Case técnico para a vaga de Especialista em Automações com IA e N8N.
+Case técnico de agendamento médico multimodal com N8N + API
 
 ## Sobre
 
@@ -32,6 +32,15 @@ O princípio que organiza tudo: **o N8N nunca é fonte da verdade**. O modelo
 escolhe _qual_ ação tomar e extrai os parâmetros; a API valida e executa. Nada
 que o paciente vê sobre disponibilidade, preço ou agendamento vem do modelo.
 Vem sempre de uma chamada real à API.
+
+## Demonstração
+
+<video src="docs/evidencias/fluxo_completo.mp4" controls width="100%"></video>
+
+Fluxo de conversa completo: consulta de horário, agendamento, checagem de
+preços e cancelamento, incluindo interação por áudio. Também mostra o envio
+do e-mail de confirmação. Mais vídeos (incluindo a navegação pelo Swagger da
+API) estão em [`docs/evidencias/`](docs/evidencias/05-demonstracao-em-video.md).
 
 ## Começando
 

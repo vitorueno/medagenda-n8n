@@ -17,7 +17,7 @@ aparece como `$API_KEY` nas transcrições.
 | [`02-lint-e-typecheck.txt`](02-lint-e-typecheck.txt)                         | `eslint`, `prettier --check` e `tsc --noEmit` sem nenhum apontamento                                          |
 | [`03-api-rest-curl.md`](03-api-rest-curl.md)                                 | Transcrições `curl` reais de todos os endpoints, incluindo os casos de erro                                 |
 | [`04-conversa-n8n-ponta-a-ponta.md`](04-conversa-n8n-ponta-a-ponta.md)       | Conversa real no chat do N8N cobrindo os quatro fluxos do enunciado, com o efeito no banco                   |
-| [`05-demonstracao-em-video.md`](05-demonstracao-em-video.md)                 | Espaço reservado para o vídeo/GIF da demonstração                                                            |
+| [`05-demonstracao-em-video.md`](05-demonstracao-em-video.md)                 | Vídeo do fluxo completo (texto, áudio, pagamento, cancelamento, e-mail) e vídeos complementares               |
 
 ## Cobertura dos critérios de avaliação
 

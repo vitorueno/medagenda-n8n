@@ -1,18 +1,20 @@
 # Demonstração em vídeo
 
-> **Pendente.** O vídeo/GIF da demonstração será gravado e adicionado aqui
-> separadamente. Este arquivo existe para reservar o lugar no índice.
+## Fluxo completo
 
-O vídeo cobre os pontos que só fazem sentido ver em movimento, e que por isso
-não aparecem nos artefatos de texto desta pasta:
+<video src="fluxo_completo.mp4" controls width="100%"></video>
 
-- Conversa por **texto** no chat do N8N: consulta de agenda, agendamento,
-  pagamento e cancelamento.
-- Conversa por **áudio**: o paciente envia um áudio e recebe a resposta em
-  áudio (transcrição via Whisper, resposta falada via TTS).
-- O **e-mail de confirmação** chegando de verdade na caixa de entrada (Gmail
-  API) e, na configuração alternativa sem Gmail, no Mailpit.
-- O painel de execuções do N8N mostrando o caminho percorrido pelo fluxo.
+Mostra o fluxo de conversa completo: consulta de horário, agendamento,
+checagem de preços e cancelamento, incluindo interação por áudio. Também
+mostra o envio do e-mail de confirmação chegando na caixa de entrada real
+(Gmail API).
 
-Arquivos serão adicionados nesta pasta como `demo-texto.gif`,
-`demo-audio.gif` e `demo-email.gif` (ou um único `demo.mp4`).
+## Vídeos complementares
+
+- [`agendamento.mp4`](agendamento.mp4) — fluxo de agendamento e recebimento
+  do e-mail de confirmação.
+- [`agendamento_exato.mp4`](agendamento_exato.mp4) — agendamento por
+  especialidade sem citar o nome do médico, mostrando a resolução
+  determinística do horário na API (sem o modelo inventar `slotId`).
+- [`swagger.mp4`](swagger.mp4) — navegação pela documentação OpenAPI/Swagger
+  da API em `http://localhost:3000/docs`.
