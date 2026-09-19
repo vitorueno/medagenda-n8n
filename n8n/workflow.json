@@ -832,6 +832,66 @@
       ],
       "id": "6f2e0dd2-036e-4e5c-ae44-26bf89fb5b7c",
       "name": "Responder Audio"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1fd734e3-e8d5-43f5-bdd0-1763cbc0a7ad",
+              "leftValue": "={{  Boolean($env.GMAIL_CLIENT_ID)  }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2912,
+        496
+      ],
+      "id": "0a813393-bc37-40a9-9929-860bf649d9d2",
+      "name": "Usar Gmail"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.agendamento.patientEmail }}",
+        "subject": "={{ $json.tipoOperacao === 'agendamento' ? 'Confirmação de agendamento' : 'Confirmação de cancelamento' }}",
+        "emailType": "text",
+        "message": "={{ $json.tipoOperacao === 'agendamento' ? 'Sua consulta foi agendada com sucesso. Detalhes: ' + JSON.stringify($json.agendamento) : 'Sua consulta foi cancelada. Detalhes: ' + JSON.stringify($json.agendamento) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        3136,
+        400
+      ],
+      "id": "56e9dd41-45a3-4c53-b660-9417790522e1",
+      "name": "Enviar Email via Gmail",
+      "webhookId": "4ae591a6-44d3-4bfd-aebb-90e39454f2b6",
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "EVDz1NkMW7Fe8CFN",
+          "name": "Gmail account"
+        }
+      }
     }
   ],
   "connections": {
@@ -990,7 +1050,7 @@
       "main": [
         [
           {
-            "node": "Enviar Email de Confirmacao",
+            "node": "Usar Gmail",
             "type": "main",
             "index": 0
           }
@@ -1092,11 +1152,31 @@
           }
         ]
       ]
+    },
+    "Usar Gmail": {
+      "main": [
+        [
+          {
+            "node": "Enviar Email via Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Enviar Email de Confirmacao",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "meta": null
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
 }

@@ -175,8 +175,11 @@ describe('n8n workflow structure', () => {
     const workflow = loadWorkflow();
     findNode(workflow, 'Detectar Agendamento ou Cancelamento');
     findNode(workflow, 'Deve Enviar Email');
-    const emailNode = findNode(workflow, 'Enviar Email de Confirmacao');
-    expect(emailNode.type).toBe('n8n-nodes-base.emailSend');
+    findNode(workflow, 'Usar Gmail');
+    const gmailNode = findNode(workflow, 'Enviar Email via Gmail');
+    expect(gmailNode.type).toBe('n8n-nodes-base.gmail');
+    const mailpitNode = findNode(workflow, 'Enviar Email de Confirmacao');
+    expect(mailpitNode.type).toBe('n8n-nodes-base.emailSend');
 
     expect(workflow.connections['Assistente de Atendimento']?.main?.[0]?.[0]?.node).toBe(
       'Detectar Agendamento ou Cancelamento',
@@ -184,7 +187,9 @@ describe('n8n workflow structure', () => {
     expect(workflow.connections['Detectar Agendamento ou Cancelamento']?.main?.[0]?.[0]?.node).toBe(
       'Deve Enviar Email',
     );
-    expect(workflow.connections['Deve Enviar Email']?.main?.[0]?.[0]?.node).toBe(
+    expect(workflow.connections['Deve Enviar Email']?.main?.[0]?.[0]?.node).toBe('Usar Gmail');
+    expect(workflow.connections['Usar Gmail']?.main?.[0]?.[0]?.node).toBe('Enviar Email via Gmail');
+    expect(workflow.connections['Usar Gmail']?.main?.[1]?.[0]?.node).toBe(
       'Enviar Email de Confirmacao',
     );
   });
@@ -224,8 +229,16 @@ describe('n8n workflow structure', () => {
     const workflow = loadWorkflow();
     const branches = workflow.connections['Deve Enviar Email']?.main ?? [];
     const targetsPerBranch = branches.map((branch) => branch.map((c) => c.node));
-    expect(targetsPerBranch[0]).toEqual(['Enviar Email de Confirmacao']);
+    expect(targetsPerBranch[0]).toEqual(['Usar Gmail']);
     expect(targetsPerBranch[1]).toEqual([]);
+
+    const gmailBranches = workflow.connections['Usar Gmail']?.main ?? [];
+    const gmailTargetsPerBranch = gmailBranches.map((branch) => branch.map((c) => c.node));
+    expect(gmailTargetsPerBranch[0]).toEqual(['Enviar Email via Gmail']);
+    expect(gmailTargetsPerBranch[1]).toEqual(['Enviar Email de Confirmacao']);
+
+    expect(workflow.connections['Enviar Email via Gmail']).toBeUndefined();
+    expect(workflow.connections['Enviar Email de Confirmacao']).toBeUndefined();
   });
 
   it('formats a text reply directly from the Agent output when no audio is needed', () => {
