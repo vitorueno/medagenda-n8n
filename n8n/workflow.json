@@ -15,10 +15,7 @@
       "name": "Recepcao do Paciente",
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.1,
-      "position": [
-        0,
-        304
-      ],
+      "position": [0, 304],
       "webhookId": "essentia-atendimento-chat"
     },
     {
@@ -50,10 +47,7 @@
       "name": "Tem Audio",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
-      "position": [
-        272,
-        304
-      ]
+      "position": [272, 304]
     },
     {
       "parameters": {
@@ -82,10 +76,7 @@
       "name": "Transcrever Audio",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [
-        528,
-        192
-      ],
+      "position": [528, 192],
       "retryOnFail": true,
       "maxTries": 3,
       "waitBetweenTries": 1000,
@@ -126,10 +117,7 @@
       "name": "Normalizar Transcricao",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [
-        784,
-        192
-      ]
+      "position": [784, 192]
     },
     {
       "parameters": {
@@ -161,10 +149,7 @@
       "name": "Normalizar Texto",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [
-        528,
-        432
-      ]
+      "position": [528, 432]
     },
     {
       "parameters": {
@@ -187,10 +172,7 @@
       "name": "Moderar Conteudo",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [
-        1040,
-        304
-      ],
+      "position": [1040, 304],
       "retryOnFail": true,
       "maxTries": 3,
       "waitBetweenTries": 1000,
@@ -230,10 +212,7 @@
       "name": "Conteudo Sinalizado",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
-      "position": [
-        1312,
-        304
-      ]
+      "position": [1312, 304]
     },
     {
       "parameters": {
@@ -253,10 +232,7 @@
       "name": "Resposta Padrao de Recusa",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [
-        1568,
-        224
-      ]
+      "position": [1568, 224]
     },
     {
       "parameters": {
@@ -288,10 +264,7 @@
       "name": "Restaurar Contexto",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [
-        1568,
-        464
-      ]
+      "position": [1568, 464]
     },
     {
       "parameters": {
@@ -306,10 +279,7 @@
       "name": "Assistente de Atendimento",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.7,
-      "position": [
-        2016,
-        544
-      ]
+      "position": [2016, 544]
     },
     {
       "parameters": {
@@ -325,10 +295,7 @@
       "name": "Modelo de Chat OpenAI",
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
-      "position": [
-        1648,
-        656
-      ],
+      "position": [1648, 656],
       "credentials": {
         "openAiApi": {
           "id": "A0peHtrx2C1D4IVJ",
@@ -346,10 +313,7 @@
       "name": "Memoria da Conversa",
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
-      "position": [
-        1584,
-        832
-      ]
+      "position": [1584, 832]
     },
     {
       "parameters": {
@@ -359,10 +323,7 @@
       "name": "Detectar Agendamento ou Cancelamento",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        2448,
-        464
-      ]
+      "position": [2448, 464]
     },
     {
       "parameters": {
@@ -393,10 +354,7 @@
       "name": "Deve Enviar Email",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
-      "position": [
-        2688,
-        496
-      ]
+      "position": [2688, 496]
     },
     {
       "parameters": {
@@ -411,10 +369,7 @@
       "name": "Enviar Email de Confirmacao",
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
-      "position": [
-        3200,
-        608
-      ],
+      "position": [3200, 608],
       "retryOnFail": true,
       "maxTries": 3,
       "waitBetweenTries": 2000,
@@ -455,10 +410,7 @@
       "name": "Precisa de Audio na Resposta",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
-      "position": [
-        2368,
-        224
-      ]
+      "position": [2368, 224]
     },
     {
       "parameters": {
@@ -495,10 +447,7 @@
       "name": "Sintetizar Audio de Resposta",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [
-        2640,
-        112
-      ],
+      "position": [2640, 112],
       "retryOnFail": true,
       "maxTries": 3,
       "waitBetweenTries": 1000,
@@ -527,10 +476,7 @@
       "name": "Formatar Resposta Texto",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [
-        2640,
-        288
-      ]
+      "position": [2640, 288]
     },
     {
       "parameters": {
@@ -569,10 +515,7 @@
       "name": "consultar_pagamento",
       "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
       "typeVersion": 1.1,
-      "position": [
-        2512,
-        704
-      ]
+      "position": [2512, 704]
     },
     {
       "parameters": {
@@ -620,10 +563,7 @@
       "name": "identificar_paciente",
       "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
       "typeVersion": 1.1,
-      "position": [
-        1744,
-        912
-      ]
+      "position": [1744, 912]
     },
     {
       "parameters": {
@@ -678,10 +618,7 @@
       "name": "consultar_disponibilidade",
       "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
       "typeVersion": 1.1,
-      "position": [
-        1952,
-        912
-      ]
+      "position": [1952, 912]
     },
     {
       "parameters": {
@@ -751,10 +688,7 @@
       "name": "agendar_consulta",
       "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
       "typeVersion": 1.1,
-      "position": [
-        2160,
-        896
-      ]
+      "position": [2160, 896]
     },
     {
       "parameters": {
@@ -801,10 +735,7 @@
       "name": "cancelar_consulta",
       "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
       "typeVersion": 1.1,
-      "position": [
-        2320,
-        864
-      ]
+      "position": [2320, 864]
     },
     {
       "parameters": {
@@ -812,10 +743,7 @@
       },
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
-      "position": [
-        2864,
-        288
-      ],
+      "position": [2864, 288],
       "id": "6219308c-83cd-4265-8c51-7d91fc19c850",
       "name": "Responder Texto"
     },
@@ -826,10 +754,7 @@
       },
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
-      "position": [
-        2864,
-        112
-      ],
+      "position": [2864, 112],
       "id": "6f2e0dd2-036e-4e5c-ae44-26bf89fb5b7c",
       "name": "Responder Audio"
     },
@@ -860,10 +785,7 @@
       },
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
-      "position": [
-        2912,
-        496
-      ],
+      "position": [2912, 496],
       "id": "0a813393-bc37-40a9-9929-860bf649d9d2",
       "name": "Usar Gmail"
     },
@@ -877,10 +799,7 @@
       },
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.2,
-      "position": [
-        3136,
-        400
-      ],
+      "position": [3136, 400],
       "id": "56e9dd41-45a3-4c53-b660-9417790522e1",
       "name": "Enviar Email via Gmail",
       "webhookId": "4ae591a6-44d3-4bfd-aebb-90e39454f2b6",
