@@ -28,6 +28,8 @@ services:
       - N8N_API_BASE_URL=http://api:3000
       - N8N_API_KEY=${API_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GMAIL_CLIENT_ID=${GMAIL_CLIENT_ID:-}
+      - GMAIL_CLIENT_SECRET=${GMAIL_CLIENT_SECRET:-}
       - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
     volumes:
       - n8n-data:/home/node/.n8n

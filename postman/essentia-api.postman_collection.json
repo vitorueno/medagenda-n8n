@@ -9,7 +9,10 @@
     { "key": "patientId", "value": "1" },
     { "key": "doctorId", "value": "1" },
     { "key": "slotId", "value": "1" },
-    { "key": "appointmentId", "value": "1" }
+    { "key": "appointmentId", "value": "1" },
+    { "key": "doctorName", "value": "Dr. Diego Alves" },
+    { "key": "bookingDate", "value": "2026-09-21" },
+    { "key": "bookingStartTime", "value": "14:00" }
   ],
   "item": [
     {
@@ -127,6 +130,67 @@
           "raw": "{{baseUrl}}/appointments/{{appointmentId}}/cancel",
           "host": ["{{baseUrl}}"],
           "path": ["appointments", "{{appointmentId}}", "cancel"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status is 200', () => pm.response.to.have.status(200));",
+              "pm.test('status is cancelled', () => pm.expect(pm.response.json().status).to.eql('cancelled'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Book appointment by details",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "x-api-key", "value": "{{apiKey}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"patientId\": {{patientId}},\n  \"doctorName\": \"{{doctorName}}\",\n  \"date\": \"{{bookingDate}}\",\n  \"startTime\": \"{{bookingStartTime}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/appointments/by-details",
+          "host": ["{{baseUrl}}"],
+          "path": ["appointments", "by-details"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status is 201', () => pm.response.to.have.status(201));",
+              "const body = pm.response.json();",
+              "pm.collectionVariables.set('appointmentId', body.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cancel appointment by patient",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "x-api-key", "value": "{{apiKey}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"patientId\": {{patientId}}\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/appointments/cancel-by-patient",
+          "host": ["{{baseUrl}}"],
+          "path": ["appointments", "cancel-by-patient"]
         }
       },
       "event": [

@@ -1,7 +1,12 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import type { AppointmentService } from './appointment.service';
 import type { AppointmentRow } from './appointment.repository';
-import type { CreateAppointmentBody, AppointmentIdParams } from './appointment.schemas';
+import type {
+  CreateAppointmentBody,
+  AppointmentIdParams,
+  BookByDetailsBody,
+  CancelByPatientBody,
+} from './appointment.schemas';
 
 function toAppointmentDto(row: AppointmentRow) {
   return {
@@ -26,6 +31,17 @@ export function createAppointmentController(service: AppointmentService) {
     },
     async cancel(request: FastifyRequest<{ Params: AppointmentIdParams }>, reply: FastifyReply) {
       const appointment = service.cancelAppointment(request.params.id);
+      return reply.status(200).send(toAppointmentDto(appointment));
+    },
+    async bookByDetails(request: FastifyRequest<{ Body: BookByDetailsBody }>, reply: FastifyReply) {
+      const appointment = service.bookByDetails(request.body);
+      return reply.status(201).send(toAppointmentDto(appointment));
+    },
+    async cancelByPatient(
+      request: FastifyRequest<{ Body: CancelByPatientBody }>,
+      reply: FastifyReply,
+    ) {
+      const appointment = service.cancelByPatient(request.body);
       return reply.status(200).send(toAppointmentDto(appointment));
     },
   };

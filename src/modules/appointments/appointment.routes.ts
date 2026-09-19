@@ -4,12 +4,16 @@ import type Database from 'better-sqlite3';
 import { createAppointmentRepository } from './appointment.repository';
 import { createSlotRepository } from '../slots/slot.repository';
 import { createPatientRepository } from '../patients/patient.repository';
+import { createDoctorRepository } from '../doctors/doctor.repository';
+import { createDoctorService } from '../doctors/doctor.service';
 import { createAppointmentService } from './appointment.service';
 import { createAppointmentController } from './appointment.controller';
 import {
   createAppointmentBodySchema,
   appointmentResponseSchema,
   appointmentIdParamsSchema,
+  bookByDetailsBodySchema,
+  cancelByPatientBodySchema,
 } from './appointment.schemas';
 import type { AvailabilityCache } from '../../shared/cache/availability-cache';
 
@@ -23,6 +27,7 @@ export function registerAppointmentRoutes(
     appointmentRepository: createAppointmentRepository(db),
     slotRepository: createSlotRepository(db),
     patientRepository: createPatientRepository(db),
+    doctorService: createDoctorService(createDoctorRepository(db)),
     availabilityCache,
   });
   const controller = createAppointmentController(service);
@@ -44,5 +49,17 @@ export function registerAppointmentRoutes(
     '/appointments/:id/cancel',
     { schema: { params: appointmentIdParamsSchema, response: { 200: appointmentResponseSchema } } },
     controller.cancel,
+  );
+
+  typedApp.post(
+    '/appointments/by-details',
+    { schema: { body: bookByDetailsBodySchema, response: { 201: appointmentResponseSchema } } },
+    controller.bookByDetails,
+  );
+
+  typedApp.post(
+    '/appointments/cancel-by-patient',
+    { schema: { body: cancelByPatientBodySchema, response: { 200: appointmentResponseSchema } } },
+    controller.cancelByPatient,
   );
 }

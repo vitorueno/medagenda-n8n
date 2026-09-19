@@ -2,6 +2,7 @@ import type Database from 'better-sqlite3';
 import type { AppointmentRepository, AppointmentRow } from './appointment.repository';
 import type { SlotRepository } from '../slots/slot.repository';
 import type { PatientRepository } from '../patients/patient.repository';
+import type { DoctorService } from '../doctors/doctor.service';
 import type { AvailabilityCache } from '../../shared/cache/availability-cache';
 import {
   PatientNotFoundError,
@@ -9,6 +10,7 @@ import {
   SlotAlreadyBookedError,
   AppointmentNotFoundError,
   AppointmentAlreadyCancelledError,
+  MultipleActiveAppointmentsError,
 } from '../../shared/errors';
 
 export interface CreateAppointmentParams {
@@ -16,11 +18,25 @@ export interface CreateAppointmentParams {
   slotId: number;
 }
 
+export interface BookByDetailsParams {
+  patientId: number;
+  doctorName?: string;
+  specialty?: string;
+  date: string;
+  startTime: string;
+}
+
+export interface CancelByPatientParams {
+  patientId: number;
+  date?: string;
+}
+
 export interface AppointmentDependencies {
   db: Database.Database;
   appointmentRepository: AppointmentRepository;
   slotRepository: SlotRepository;
   patientRepository: PatientRepository;
+  doctorService: DoctorService;
   availabilityCache: AvailabilityCache;
 }
 
@@ -87,6 +103,50 @@ export function createAppointmentService(deps: AppointmentDependencies) {
         deps.availabilityCache.invalidateDate(slot.date);
       }
       return appointment;
+    },
+    bookByDetails(params: BookByDetailsParams): AppointmentRow {
+      const doctor = deps.doctorService.resolveDoctor({
+        name: params.doctorName,
+        specialty: params.specialty,
+      });
+
+      const slots = deps.slotRepository.findAvailable({
+        date: params.date,
+        doctorId: doctor.id,
+      });
+      const slot = slots.find((candidate) => candidate.startTime === params.startTime);
+
+      if (!slot) {
+        throw new SlotNotFoundError(`${doctor.name} ${params.date} ${params.startTime}`);
+      }
+
+      const appointment = createTransaction({ patientId: params.patientId, slotId: slot.id });
+      deps.availabilityCache.invalidateDate(params.date);
+      return appointment;
+    },
+    cancelByPatient(params: CancelByPatientParams): AppointmentRow {
+      const active = deps.appointmentRepository.findActiveByPatient(params.patientId);
+      const candidates = params.date
+        ? active.filter((appointment) => {
+            const slot = deps.slotRepository.findById(appointment.slot_id);
+            return slot?.date === params.date;
+          })
+        : active;
+
+      const identifier = params.date
+        ? `patient ${params.patientId} on ${params.date}`
+        : `patient ${params.patientId}`;
+
+      if (candidates.length > 1) {
+        throw new MultipleActiveAppointmentsError(identifier);
+      }
+
+      const [match] = candidates;
+      if (!match) {
+        throw new AppointmentNotFoundError(identifier);
+      }
+
+      return this.cancelAppointment(match.id);
     },
   };
 }

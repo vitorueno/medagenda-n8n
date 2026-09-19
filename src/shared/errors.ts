@@ -26,6 +26,15 @@ export class DoctorNotFoundError extends DomainError {
   }
 }
 
+export class DoctorAmbiguousError extends DomainError {
+  readonly statusCode = 422;
+  readonly code = 'DOCTOR_AMBIGUOUS';
+
+  constructor(identifier: string) {
+    super(`More than one doctor matches: ${identifier}`);
+  }
+}
+
 export class SlotNotFoundError extends DomainError {
   readonly statusCode = 404;
   readonly code = 'SLOT_NOT_FOUND';
@@ -59,6 +68,15 @@ export class AppointmentAlreadyCancelledError extends DomainError {
 
   constructor(identifier: string) {
     super(`Appointment already cancelled: ${identifier}`);
+  }
+}
+
+export class MultipleActiveAppointmentsError extends DomainError {
+  readonly statusCode = 422;
+  readonly code = 'MULTIPLE_ACTIVE_APPOINTMENTS';
+
+  constructor(identifier: string) {
+    super(`Patient has more than one active appointment: ${identifier}`);
   }
 }
 

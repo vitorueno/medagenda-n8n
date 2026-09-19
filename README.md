@@ -69,15 +69,19 @@ requisições na ordem em que aparecem na coleção.
 
 ## Endpoints
 
-| Método | Rota                                       | Descrição                              |
-| ------ | ------------------------------------------ | -------------------------------------- |
-| GET    | `/patients/lookup?email=` ou `?phone=`     | Identifica um paciente                 |
-| GET    | `/doctors`                                 | Lista médicos                          |
-| GET    | `/availability?date=&specialty=&doctorId=` | Lista horários disponíveis             |
-| POST   | `/appointments`                            | Cria um agendamento                    |
-| GET    | `/appointments/:id`                        | Consulta um agendamento                |
-| POST   | `/appointments/:id/cancel`                 | Cancela um agendamento                 |
-| GET    | `/payments?consultationType=`              | Consulta valores e formas de pagamento |
+| Método | Rota                                       | Descrição                                                                                   |
+| ------ | ------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| GET    | `/patients/lookup?email=` ou `?phone=`     | Identifica um paciente                                                                      |
+| GET    | `/doctors`                                 | Lista médicos                                                                               |
+| GET    | `/availability?date=&specialty=&doctorId=` | Lista horários disponíveis                                                                  |
+| POST   | `/appointments`                            | Cria um agendamento por `slotId`                                                            |
+| GET    | `/appointments/:id`                        | Consulta um agendamento                                                                     |
+| POST   | `/appointments/:id/cancel`                 | Cancela um agendamento por `id`                                                             |
+| POST   | `/appointments/by-details`                 | Agenda por médico/especialidade + data + horário (resolve o slot no servidor)               |
+| POST   | `/appointments/cancel-by-patient`          | Cancela a consulta ativa de um paciente (usa `date` para desambiguar se houver mais de uma) |
+| GET    | `/payments?consultationType=`              | Consulta valores e formas de pagamento                                                      |
+
+`by-details` e `cancel-by-patient` existem para que o agente de IA do N8N nunca precise "lembrar" um `slotId`/`appointmentId` opaco entre duas chamadas — ele só repete dados que já apareceram na própria conversa (médico, data, horário), e a resolução do id real acontece de forma determinística e testada aqui na API. Ver a seção do checklist mais abaixo para o contexto do bug que motivou isso.
 
 ## Limitações conhecidas
 

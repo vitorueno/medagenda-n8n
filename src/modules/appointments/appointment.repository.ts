@@ -19,6 +19,9 @@ export function createAppointmentRepository(db: Database.Database) {
   const cancelStmt = db.prepare(
     "UPDATE appointments SET status = 'cancelled', cancelled_at = datetime('now') WHERE id = ?",
   );
+  const findActiveByPatientStmt = db.prepare(
+    "SELECT id, patient_id, slot_id, status, created_at, cancelled_at FROM appointments WHERE patient_id = ? AND status = 'active'",
+  );
 
   return {
     create(patientId: number, slotId: number): AppointmentRow {
@@ -30,6 +33,9 @@ export function createAppointmentRepository(db: Database.Database) {
     },
     cancel(id: number): void {
       cancelStmt.run(id);
+    },
+    findActiveByPatient(patientId: number): AppointmentRow[] {
+      return findActiveByPatientStmt.all(patientId) as AppointmentRow[];
     },
   };
 }

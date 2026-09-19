@@ -8,7 +8,7 @@
         "public": true,
         "mode": "webhook",
         "options": {
-          "responseMode": "lastNode"
+          "responseMode": "responseNode"
         }
       },
       "id": "chat-trigger-1",
@@ -307,8 +307,8 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.7,
       "position": [
-        1568,
-        384
+        2016,
+        544
       ]
     },
     {
@@ -326,8 +326,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
       "position": [
-        1472,
-        560
+        1648,
+        656
       ],
       "credentials": {
         "openAiApi": {
@@ -347,8 +347,8 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        1632,
-        560
+        1584,
+        832
       ]
     },
     {
@@ -360,8 +360,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1824,
-        384
+        2448,
+        464
       ]
     },
     {
@@ -394,8 +394,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        2064,
-        384
+        2688,
+        496
       ]
     },
     {
@@ -412,8 +412,8 @@
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
       "position": [
-        2304,
-        320
+        3200,
+        608
       ],
       "retryOnFail": true,
       "maxTries": 3,
@@ -456,8 +456,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        2544,
-        384
+        2368,
+        224
       ]
     },
     {
@@ -496,8 +496,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2784,
-        320
+        2640,
+        112
       ],
       "retryOnFail": true,
       "maxTries": 3,
@@ -528,8 +528,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        2784,
-        448
+        2640,
+        288
       ]
     },
     {
@@ -621,8 +621,8 @@
       "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
       "typeVersion": 1.1,
       "position": [
-        1792,
-        704
+        1744,
+        912
       ]
     },
     {
@@ -669,8 +669,7 @@
             },
             {
               "name": "doctorId",
-              "description": "id do médico, se informado",
-              "type": "number"
+              "description": "id do médico, se informado"
             }
           ]
         }
@@ -680,15 +679,15 @@
       "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
       "typeVersion": 1.1,
       "position": [
-        1968,
-        704
+        1952,
+        912
       ]
     },
     {
       "parameters": {
-        "toolDescription": "Cria um agendamento para um paciente em um horário específico. Só chame depois de confirmar o patientId (via identificar_paciente) e o slotId (via consultar_disponibilidade). Retorna o agendamento criado ou um erro se o horário não estiver mais disponível.",
+        "toolDescription": "Agenda uma consulta para um paciente com um médico/especialidade, data e horário específicos. Informe doctorName OU specialty (o servidor resolve o médico e o horário exatos a partir de dados reais, nunca invente). Só chame depois de confirmar o patientId via identificar_paciente. Retorna o agendamento criado ou um erro se não houver horário disponível com esses critérios.",
         "method": "POST",
-        "url": "={{ $env.N8N_API_BASE_URL }}/appointments",
+        "url": "={{ $env.N8N_API_BASE_URL }}/appointments/by-details",
         "sendHeaders": true,
         "parametersHeaders": {
           "values": [
@@ -706,7 +705,18 @@
               "name": "patientId"
             },
             {
-              "name": "slotId"
+              "name": "date"
+            },
+            {
+              "name": "startTime"
+            },
+            {
+              "name": "doctorName",
+              "valueProvider": "modelOptional"
+            },
+            {
+              "name": "specialty",
+              "valueProvider": "modelOptional"
             }
           ]
         },
@@ -718,9 +728,21 @@
               "type": "number"
             },
             {
-              "name": "slotId",
-              "description": "id do horário, obtido via consultar_disponibilidade",
-              "type": "number"
+              "name": "date",
+              "description": "data da consulta no formato YYYY-MM-DD",
+              "type": "string"
+            },
+            {
+              "name": "startTime",
+              "description": "horário de início no formato HH:MM, exatamente como apareceu na consulta de disponibilidade"
+            },
+            {
+              "name": "doctorName",
+              "description": "nome do médico, se o paciente mencionar um médico específico (ex.: \"Dr. Diego Alves\")"
+            },
+            {
+              "name": "specialty",
+              "description": "especialidade médica, use se o paciente não especificar o nome do médico"
             }
           ]
         }
@@ -730,15 +752,15 @@
       "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
       "typeVersion": 1.1,
       "position": [
-        2144,
-        704
+        2160,
+        896
       ]
     },
     {
       "parameters": {
-        "toolDescription": "Cancela um agendamento existente pelo seu id. Retorna o agendamento cancelado ou um erro se ele não existir ou já estiver cancelado.",
+        "toolDescription": "Cancela a consulta ativa de um paciente. Informe date apenas se o paciente tiver mais de uma consulta ativa e for preciso desambiguar. Retorna a consulta cancelada ou um erro se não houver consulta ativa (ou houver mais de uma sem desambiguação suficiente).",
         "method": "POST",
-        "url": "={{ $env.N8N_API_BASE_URL }}/appointments/{appointmentId}/cancel",
+        "url": "={{ $env.N8N_API_BASE_URL }}/appointments/cancel-by-patient",
         "sendHeaders": true,
         "parametersHeaders": {
           "values": [
@@ -749,12 +771,28 @@
             }
           ]
         },
+        "sendBody": true,
+        "parametersBody": {
+          "values": [
+            {
+              "name": "patientId"
+            },
+            {
+              "name": "date",
+              "valueProvider": "modelOptional"
+            }
+          ]
+        },
         "placeholderDefinitions": {
           "values": [
             {
-              "name": "appointmentId",
-              "description": "id do agendamento a cancelar",
+              "name": "patientId",
+              "description": "id do paciente, obtido via identificar_paciente",
               "type": "number"
+            },
+            {
+              "name": "date",
+              "description": "data da consulta a cancelar no formato YYYY-MM-DD, use somente se o paciente tiver mais de uma consulta ativa"
             }
           ]
         }
@@ -765,8 +803,35 @@
       "typeVersion": 1.1,
       "position": [
         2320,
-        704
+        864
       ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        2864,
+        288
+      ],
+      "id": "6219308c-83cd-4265-8c51-7d91fc19c850",
+      "name": "Responder Texto"
+    },
+    {
+      "parameters": {
+        "respondWith": "binary",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        2864,
+        112
+      ],
+      "id": "6f2e0dd2-036e-4e5c-ae44-26bf89fb5b7c",
+      "name": "Responder Audio"
     }
   ],
   "connections": {
@@ -1001,6 +1066,28 @@
           {
             "node": "Assistente de Atendimento",
             "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatar Resposta Texto": {
+      "main": [
+        [
+          {
+            "node": "Responder Texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sintetizar Audio de Resposta": {
+      "main": [
+        [
+          {
+            "node": "Responder Audio",
+            "type": "main",
             "index": 0
           }
         ]
