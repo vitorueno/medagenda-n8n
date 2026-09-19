@@ -4,8 +4,15 @@ services:
     command: sh -c "npm run seed && node dist/index.js"
     ports:
       - '3000:3000'
-    env_file:
-      - .env
+    # Listed explicitly instead of `env_file: .env` so the API container never
+    # receives the OpenAI/Gmail secrets that only N8N needs.
+    environment:
+      - PORT=3000
+      - DATABASE_PATH=/app/data/dev.db
+      - API_KEY=${API_KEY}
+      - AVAILABILITY_CACHE_TTL_SECONDS=${AVAILABILITY_CACHE_TTL_SECONDS:-30}
+      - RATE_LIMIT_MAX=${RATE_LIMIT_MAX:-100}
+      - RATE_LIMIT_TIME_WINDOW_MS=${RATE_LIMIT_TIME_WINDOW_MS:-60000}
     volumes:
       - api-data:/app/data
     healthcheck:
