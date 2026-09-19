@@ -80,9 +80,6 @@ describe('POST /appointments/by-details', () => {
   });
 
   it('returns 404 for a date/time whose only matching slot is already booked', async () => {
-    // findAvailable only returns slots with status 'available', so an
-    // already-booked date/time looks identical to a nonexistent one from
-    // this endpoint's perspective — the caller never deals in slot ids.
     const { app, seed, env } = buildTestApp();
     const response = await app.inject({
       method: 'POST',
