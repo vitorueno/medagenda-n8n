@@ -22,10 +22,11 @@ import { registerPaymentRoutes } from './modules/payments/payment.routes';
 export interface BuildAppDeps {
   db: Database.Database;
   env: Env;
+  logger?: boolean;
 }
 
 export function buildApp(deps: BuildAppDeps): FastifyInstance {
-  const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
+  const app = Fastify({ logger: deps.logger ?? true }).withTypeProvider<ZodTypeProvider>();
 
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
@@ -61,12 +62,9 @@ export function buildApp(deps: BuildAppDeps): FastifyInstance {
 
   const availabilityCache = createAvailabilityCache(deps.env.availabilityCacheTtlSeconds);
 
-  // Routes are registered inside a nested plugin so avvio defers their
-  // registration until after the rate-limit (and swagger) plugins above have
-  // actually run. Those plugins wire themselves up via an `onRoute` hook,
-  // which only affects routes declared *after* the hook exists; declaring
-  // routes synchronously at the top level (before the async plugins above
-  // have been booted) would silently skip rate limiting for every route.
+  // Rate limit and swagger attach themselves through an `onRoute` hook, which
+  // only sees routes declared after the hook exists. Nesting the routes in
+  // their own plugin defers them until those plugins have booted.
   void app.register(async (instance) => {
     registerPatientRoutes(instance, deps.db);
     registerDoctorRoutes(instance, deps.db);
