@@ -2,8 +2,7 @@
 
 ## Fluxo completo
 
-▶️ [**fluxo_completo.mp4**](fluxo_completo.mp4) (abre o player de vídeo do
-próprio GitHub)
+[Link para o vídeo completo](fluxo_completo.mp4)
 
 Mostra o fluxo de conversa completo: consulta de horário, agendamento,
 checagem de preços e cancelamento, incluindo interação por áudio. Também
