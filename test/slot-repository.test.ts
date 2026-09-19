@@ -30,21 +30,27 @@ describe('slotRepository', () => {
   });
 
   it('finds available slots for a date, excluding booked ones', () => {
-    const { repository } = setup();
-    const slots = repository.findAvailable({ date: '2026-09-20' });
+    const { repository, seed } = setup();
+    const slots = repository.findAvailable({ date: seed.dates[0] as string });
     expect(slots).toHaveLength(1);
-    expect(slots[0]).toMatchObject({ date: '2026-09-20', specialty: 'cardiology' });
+    expect(slots[0]).toMatchObject({ date: seed.dates[0], specialty: 'cardiology' });
   });
 
   it('filters by doctorId', () => {
     const { repository, seed } = setup();
-    const slots = repository.findAvailable({ date: '2026-09-21', doctorId: seed.doctorIds[1] });
+    const slots = repository.findAvailable({
+      date: seed.dates[1] as string,
+      doctorId: seed.doctorIds[1],
+    });
     expect(slots).toHaveLength(1);
   });
 
   it('filters by specialty', () => {
-    const { repository } = setup();
-    const slots = repository.findAvailable({ date: '2026-09-21', specialty: 'dermatology' });
+    const { repository, seed } = setup();
+    const slots = repository.findAvailable({
+      date: seed.dates[1] as string,
+      specialty: 'dermatology',
+    });
     expect(slots).toHaveLength(1);
   });
 

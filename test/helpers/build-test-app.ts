@@ -13,10 +13,14 @@ export interface TestApp {
 
 const TEST_API_KEY = 'test-api-key-0123456789';
 
+// The seed derives its slot dates from "today"; pinning a reference date here
+// keeps every date assertion in the suite deterministic.
+const SEED_REFERENCE_DATE = new Date(2026, 8, 19);
+
 export function buildTestApp(envOverrides: Partial<Env> = {}): TestApp {
   const db = createDatabase(':memory:');
   migrate(db);
-  const seed = seedDatabase(db);
+  const seed = seedDatabase(db, { referenceDate: SEED_REFERENCE_DATE });
 
   const env: Env = {
     port: 0,
@@ -28,7 +32,7 @@ export function buildTestApp(envOverrides: Partial<Env> = {}): TestApp {
     ...envOverrides,
   };
 
-  const app = buildApp({ db, env });
+  const app = buildApp({ db, env, logger: false });
 
   return { app, seed, env };
 }
