@@ -1,0 +1,13 @@
+# Lint, formatacao e checagem de tipos
+# Gerado em: 2026-09-19T13:37:01-03:00
+
+$ npx eslint .
+exit code: 0  (sem saida = nenhum problema encontrado)
+
+$ npx prettier --check .
+Checking formatting...
+All matched files use Prettier code style!
+exit code: 0
+
+$ npx tsc --noEmit
+exit code: 0  (sem saida = nenhum erro de tipo)

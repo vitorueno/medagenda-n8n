@@ -1,0 +1,127 @@
+# Saida de: npx vitest run
+# Gerado em: 2026-09-19T13:36:58-03:00
+# Node: v24.20.0
+
+
+ RUN  v2.1.9 /home/vauotto/projects/fast_projects/medicalEssentia
+
+ ✓ test/n8n-workflow.test.ts > n8n workflow structure > is valid JSON with the expected top-level shape
+ ✓ test/n8n-workflow.test.ts > n8n workflow structure > has no duplicate node names
+ ✓ test/n8n-workflow.test.ts > n8n workflow structure > has a Chat Trigger as the entry point
+ ✓ test/n8n-workflow.test.ts > n8n workflow structure > routes audio and text through separate normalization paths that both produce a "mensagem" field
+ ✓ test/n8n-workflow.test.ts > n8n workflow structure > routes both normalized message paths into moderation, and moderation into a flagged/not-flagged branch
+ ✓ test/n8n-workflow.test.ts > n8n workflow structure > every connection target references a node that actually exists
+ ✓ test/n8n-workflow.test.ts > n8n workflow structure > wires the not-flagged branch into the AI Agent, with a chat model and memory attached
+ ✓ test/n8n-workflow.test.ts > n8n workflow structure > wires all 5 tools to the AI Agent via ai_tool connections
+ ✓ test/n8n-workflow.test.ts > n8n workflow structure > every tool sends the x-api-key header and targets the internal API base URL
+ ✓ test/n8n-workflow.test.ts > n8n workflow structure > detects booking/cancellation from the agent output and branches to an email send node
+ ✓ test/n8n-workflow.test.ts > n8n workflow structure > branches to text-to-speech only when the original message was audio
+ ✓ test/n8n-workflow.test.ts > n8n workflow structure > restores mensagem/sessionId/foiAudio after moderation destroys the item shape
+ ✓ test/n8n-workflow.test.ts > n8n workflow structure > fans the Agent output out to independent parallel side-effect and reply chains
+ ✓ test/n8n-workflow.test.ts > n8n workflow structure > keeps the email side-effect chain as a true dead end, not feeding the reply chain
+ ✓ test/n8n-workflow.test.ts > n8n workflow structure > formats a text reply directly from the Agent output when no audio is needed
+ ✓ test/n8n-workflow.test.ts > n8n workflow structure > sanitizes tool names before comparing them in the booking-detection code node
+ ✓ test/n8n-workflow.test.ts > n8n workflow structure > guards cross-node expressions with isExecuted instead of relying on optional chaining alone
+ ✓ test/n8n-workflow.test.ts > n8n workflow structure > configures native retry on every node that calls an external service (OpenAI, SMTP)
+ ✓ test/sanity.test.ts > test harness > runs vitest correctly
+ ✓ test/normalize.test.ts > normalizeText > lowercases, trims, strips accents and collapses whitespace
+ ✓ test/normalize.test.ts > normalizeText > keeps a "Dr."/"Dra." prefix, unlike normalizeName
+ ✓ test/normalize.test.ts > normalizeName > lowercases and trims
+ ✓ test/normalize.test.ts > normalizeName > strips accents
+ ✓ test/normalize.test.ts > normalizeName > strips "Dr."/"Dra." prefixes regardless of case or punctuation
+ ✓ test/normalize.test.ts > normalizeName > collapses repeated whitespace
+ ✓ test/normalize.test.ts > normalizeName > treats equivalent names as equal after normalization
+ ✓ test/availability-cache.test.ts > createAvailabilityCache > returns undefined for a missing key
+ ✓ test/availability-cache.test.ts > createAvailabilityCache > returns a cached value before it expires
+ ✓ test/availability-cache.test.ts > createAvailabilityCache > expires entries after the ttl
+ ✓ test/availability-cache.test.ts > createAvailabilityCache > invalidates every key for a given date, regardless of filters
+ ✓ test/env.test.ts > loadEnv > parses required values and applies defaults
+ ✓ test/env.test.ts > loadEnv > overrides defaults when variables are provided
+ ✓ test/env.test.ts > loadEnv > throws when a required variable is missing
+ ✓ test/env.test.ts > loadEnv > throws when API_KEY is too short
+ ✓ test/seed.test.ts > seedDatabase > inserts patients, doctors, slots, an existing booking and payment configs
+ ✓ test/seed.test.ts > seedDatabase > places every slot in the future relative to the reference date
+ ✓ test/seed.test.ts > seedDatabase > defaults to dates in the future when no reference date is given
+ ✓ test/db.test.ts > migrate > creates all required tables
+ ✓ test/db.test.ts > migrate > is idempotent when run twice
+ ✓ test/db.test.ts > createDatabase > creates the parent directory when it does not exist yet
+ ✓ test/slot-repository.test.ts > slotRepository > finds a slot by id
+ ✓ test/slot-repository.test.ts > slotRepository > returns undefined for a missing id
+ ✓ test/slot-repository.test.ts > slotRepository > updates a slot status
+ ✓ test/slot-repository.test.ts > slotRepository > finds available slots for a date, excluding booked ones
+ ✓ test/slot-repository.test.ts > slotRepository > filters by doctorId
+ ✓ test/slot-repository.test.ts > slotRepository > filters by specialty
+ ✓ test/slot-repository.test.ts > slotRepository > returns an empty array when nothing matches
+ ✓ test/doctor-service.test.ts > doctorService.resolveDoctor > resolves by exact name
+ ✓ test/doctor-service.test.ts > doctorService.resolveDoctor > resolves regardless of accents, case, or "Dr./Dra." prefix
+ ✓ test/doctor-service.test.ts > doctorService.resolveDoctor > resolves by specialty when no name is given
+ ✓ test/doctor-service.test.ts > doctorService.resolveDoctor > throws DoctorNotFoundError when nothing matches
+ ✓ test/doctor-service.test.ts > doctorService.resolveDoctor > throws DoctorAmbiguousError when name is omitted and specialty matches more than one doctor
+ ✓ test/error-handler.test.ts > registerErrorHandler > maps a not-found domain error to 404 with its code
+ ✓ test/error-handler.test.ts > registerErrorHandler > maps a conflict domain error to 409 with its code
+ ✓ test/error-handler.test.ts > registerErrorHandler > maps an unexpected error to a generic 500 without leaking details
+ ✓ test/auth-plugin.test.ts > authPlugin > allows public paths without a key
+ ✓ test/auth-plugin.test.ts > authPlugin > does not treat a route that merely shares a public path prefix as public
+ ✓ test/auth-plugin.test.ts > authPlugin > rejects a key that is a prefix of the expected one
+ ✓ test/auth-plugin.test.ts > authPlugin > rejects protected paths without a key
+ ✓ test/auth-plugin.test.ts > authPlugin > rejects protected paths with a wrong key
+ ✓ test/auth-plugin.test.ts > authPlugin > allows protected paths with the correct key
+ ✓ test/appointments-concurrency.test.ts > concurrent booking of the same slot > only lets one of two simultaneous requests succeed
+ ✓ test/server.test.ts > buildApp > exposes a public health check
+ ✓ test/patients.test.ts > GET /patients/lookup > finds a patient by email
+ ✓ test/payments.test.ts > GET /payments > lists all payment configs when no filter is given
+ ✓ test/server.test.ts > buildApp > serves swagger UI without an API key
+ ✓ test/doctors.test.ts > GET /doctors > lists all doctors
+ ✓ test/doctors.test.ts > GET /doctors > returns 401 without an API key
+ ✓ test/swagger.test.ts > swagger documentation > exposes an OpenAPI document listing the known paths
+ ✓ test/swagger.test.ts > swagger documentation > documents the x-api-key security requirement
+ ✓ test/payments.test.ts > GET /payments > filters by consultationType
+ ✓ test/payments.test.ts > GET /payments > returns 404 for an unknown consultationType
+ ✓ test/appointments-book-by-details.test.ts > POST /appointments/by-details > books by doctor name (accents/prefix-insensitive), date and time
+ ✓ test/appointments-cancel.test.ts > POST /appointments/:id/cancel > cancels an active appointment and frees its slot 311ms
+ ✓ test/appointments-cancel-by-patient.test.ts > POST /appointments/cancel-by-patient > cancels the single active appointment for a patient 310ms
+ ✓ test/patients.test.ts > GET /patients/lookup > finds a patient by phone
+ ✓ test/patients.test.ts > GET /patients/lookup > returns 404 when no patient matches
+ ✓ test/patients.test.ts > GET /patients/lookup > returns 400 when neither email nor phone is provided
+ ✓ test/patients.test.ts > GET /patients/lookup > returns 400 when an unknown query field is provided
+ ✓ test/patients.test.ts > GET /patients/lookup > returns 401 without an API key
+ ✓ test/appointments-cancel.test.ts > POST /appointments/:id/cancel > returns 404 for a non-existent appointment
+ ✓ test/appointments-cancel.test.ts > POST /appointments/:id/cancel > returns 409 when cancelling an already-cancelled appointment
+ ✓ test/security-edge-cases.test.ts > security and edge cases > rejects an oversized name-like field via strict schema (extra field) 301ms
+ ✓ test/security-edge-cases.test.ts > security and edge cases > rejects a wrong-typed field
+ ✓ test/security-edge-cases.test.ts > security and edge cases > treats a SQL-injection-shaped email as a literal value and returns 404, not a server error
+ ✓ test/security-edge-cases.test.ts > security and edge cases > rejects an overly long phone value
+ ✓ test/security-edge-cases.test.ts > security and edge cases > enforces the rate limit once the configured maximum is exceeded
+ ✓ test/availability.test.ts > GET /availability > returns available slots for a date
+ ✓ test/availability.test.ts > GET /availability > returns an empty array when there is no availability
+ ✓ test/availability.test.ts > GET /availability > filters by specialty
+ ✓ test/availability.test.ts > GET /availability > matches a specialty regardless of case and accents
+ ✓ test/availability.test.ts > GET /availability > rejects a malformed date
+ ✓ test/availability.test.ts > GET /availability > returns the same result for repeated identical queries
+ ✓ test/appointments-cancel-by-patient.test.ts > POST /appointments/cancel-by-patient > disambiguates by date when the patient has more than one active appointment
+ ✓ test/appointments-cancel-by-patient.test.ts > POST /appointments/cancel-by-patient > frees the cancelled slot back into availability
+ ✓ test/appointments-cancel-by-patient.test.ts > POST /appointments/cancel-by-patient > returns 404 when the given date matches no active appointment
+ ✓ test/appointments-cancel-by-patient.test.ts > POST /appointments/cancel-by-patient > returns 404 when the patient has no active appointment
+ ✓ test/security-edge-cases.test.ts > security and edge cases > rejects a boolean patientId instead of silently coercing it to a number
+ ✓ test/security-edge-cases.test.ts > security and edge cases > rejects an array patientId instead of silently coercing it to a number
+ ✓ test/appointments-create.test.ts > POST /appointments > books an available slot 309ms
+ ✓ test/appointments-create.test.ts > POST /appointments > returns 409 when the slot is already booked
+ ✓ test/appointments-create.test.ts > POST /appointments > returns 404 when the slot does not exist
+ ✓ test/appointments-create.test.ts > POST /appointments > returns 404 when the patient does not exist
+ ✓ test/appointments-create.test.ts > POST /appointments > returns 400 for a non-numeric patientId
+ ✓ test/appointments-create.test.ts > POST /appointments > invalidates the availability cache for the booked date
+ ✓ test/appointments-create.test.ts > GET /appointments/:id > returns 404 for a non-existent appointment
+ ✓ test/appointments-book-by-details.test.ts > POST /appointments/by-details > books by specialty when no doctor name is given
+ ✓ test/appointments-book-by-details.test.ts > POST /appointments/by-details > returns 404 when the doctor does not match any doctor
+ ✓ test/appointments-book-by-details.test.ts > POST /appointments/by-details > returns 404 when the doctor has no slot at that exact date/time
+ ✓ test/appointments-book-by-details.test.ts > POST /appointments/by-details > returns 404 for a date/time whose only matching slot is already booked
+ ✓ test/appointments-book-by-details.test.ts > POST /appointments/by-details > returns 404 when the patient does not exist
+ ✓ test/appointments-book-by-details.test.ts > POST /appointments/by-details > invalidates the availability cache for the booked date
+ ✓ test/security-edge-cases.test.ts > security and edge cases > never leaks internal error details to the client
+ ✓ test/appointments-book-by-details.test.ts > POST /appointments/by-details > returns 400 when neither doctorName nor specialty is given
+
+ Test Files  23 passed (23)
+      Tests  114 passed (114)
+   Start at  13:36:59
+   Duration  1.82s (transform 1.96s, setup 0ms, collect 11.51s, tests 5.00s, environment 9ms, prepare 3.84s)
+

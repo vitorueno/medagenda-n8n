@@ -38,6 +38,10 @@ services:
       - GMAIL_CLIENT_ID=${GMAIL_CLIENT_ID:-}
       - GMAIL_CLIENT_SECRET=${GMAIL_CLIENT_SECRET:-}
       - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
+      # Keep execution history so the Executions tab can be used to inspect runs.
+      - EXECUTIONS_DATA_SAVE_ON_SUCCESS=all
+      - EXECUTIONS_DATA_SAVE_ON_ERROR=all
+      - EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS=true
     volumes:
       - n8n-data:/home/node/.n8n
       - ./n8n:/workflows
