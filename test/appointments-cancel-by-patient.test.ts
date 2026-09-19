@@ -54,6 +54,44 @@ describe('POST /appointments/cancel-by-patient', () => {
     await app.close();
   });
 
+  it('frees the cancelled slot back into availability', async () => {
+    const { app, seed, env } = buildTestApp();
+
+    await app.inject({
+      method: 'POST',
+      url: '/appointments/cancel-by-patient',
+      headers: authHeaders(env),
+      payload: { patientId: seed.patientIds[1] },
+    });
+
+    const availability = await app.inject({
+      method: 'GET',
+      url: '/availability?date=2026-09-20',
+      headers: authHeaders(env),
+    });
+
+    expect(availability.json()).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: seed.slotIds[1], startTime: '10:00' }),
+      ]),
+    );
+    await app.close();
+  });
+
+  it('returns 404 when the given date matches no active appointment', async () => {
+    const { app, seed, env } = buildTestApp();
+    const response = await app.inject({
+      method: 'POST',
+      url: '/appointments/cancel-by-patient',
+      headers: authHeaders(env),
+      payload: { patientId: seed.patientIds[1], date: '2026-09-21' },
+    });
+
+    expect(response.statusCode).toBe(404);
+    expect(response.json().error).toBe('APPOINTMENT_NOT_FOUND');
+    await app.close();
+  });
+
   it('returns 404 when the patient has no active appointment', async () => {
     const { app, seed, env } = buildTestApp();
     const response = await app.inject({
