@@ -12,7 +12,15 @@ describe('POST /appointments/cancel-by-patient', () => {
     });
 
     expect(response.statusCode).toBe(200);
-    expect(response.json()).toMatchObject({ patientId: seed.patientIds[1], status: 'cancelled' });
+    expect(response.json()).toMatchObject({
+      patientId: seed.patientIds[1],
+      status: 'cancelled',
+      doctorName: 'Dra. Carla Mendes',
+      specialty: 'cardiology',
+      date: '2026-09-20',
+      startTime: '10:00',
+      endTime: '10:30',
+    });
     await app.close();
   });
 

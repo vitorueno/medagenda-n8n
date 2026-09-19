@@ -21,6 +21,11 @@ describe('POST /appointments/by-details', () => {
       patientId: seed.patientIds[0],
       slotId: seed.slotIds[2],
       status: 'active',
+      doctorName: 'Dr. Diego Alves',
+      specialty: 'dermatology',
+      date: '2026-09-21',
+      startTime: '14:00',
+      endTime: '14:30',
     });
     await app.close();
   });

@@ -22,15 +22,17 @@ export function registerAppointmentRoutes(
   db: Database.Database,
   availabilityCache: AvailabilityCache,
 ): void {
+  const slotRepository = createSlotRepository(db);
+  const doctorRepository = createDoctorRepository(db);
   const service = createAppointmentService({
     db,
     appointmentRepository: createAppointmentRepository(db),
-    slotRepository: createSlotRepository(db),
+    slotRepository,
     patientRepository: createPatientRepository(db),
-    doctorService: createDoctorService(createDoctorRepository(db)),
+    doctorService: createDoctorService(doctorRepository),
     availabilityCache,
   });
-  const controller = createAppointmentController(service);
+  const controller = createAppointmentController(service, slotRepository, doctorRepository);
   const typedApp = app.withTypeProvider<ZodTypeProvider>();
 
   typedApp.post(

@@ -51,4 +51,9 @@ export const appointmentResponseSchema = z.object({
   status: z.enum(['active', 'cancelled']),
   createdAt: z.string(),
   cancelledAt: z.string().nullable(),
+  doctorName: z.string(),
+  specialty: z.string(),
+  date: z.string(),
+  startTime: z.string(),
+  endTime: z.string(),
 });

@@ -404,7 +404,7 @@
         "toEmail": "={{ $json.agendamento.patientEmail }}",
         "subject": "={{ $json.tipoOperacao === 'agendamento' ? 'Confirmação de agendamento' : 'Confirmação de cancelamento' }}",
         "emailFormat": "text",
-        "text": "={{ $json.tipoOperacao === 'agendamento' ? 'Sua consulta foi agendada com sucesso. Detalhes: ' + JSON.stringify($json.agendamento) : 'Sua consulta foi cancelada. Detalhes: ' + JSON.stringify($json.agendamento) }}",
+        "text": "={{ $json.tipoOperacao === 'agendamento' ? 'Olá! Sua consulta com ' + $json.agendamento.doctorName + ' (' + $json.agendamento.specialty + ') foi confirmada para o dia ' + $json.agendamento.date.split('-').reverse().join('/') + ' às ' + $json.agendamento.startTime + '. Até lá!' : 'Olá! Sua consulta com ' + $json.agendamento.doctorName + ' (' + $json.agendamento.specialty + ') do dia ' + $json.agendamento.date.split('-').reverse().join('/') + ' às ' + $json.agendamento.startTime + ' foi cancelada com sucesso.' }}",
         "options": {}
       },
       "id": "email-confirmacao-1",
@@ -872,7 +872,7 @@
         "sendTo": "={{ $json.agendamento.patientEmail }}",
         "subject": "={{ $json.tipoOperacao === 'agendamento' ? 'Confirmação de agendamento' : 'Confirmação de cancelamento' }}",
         "emailType": "text",
-        "message": "={{ $json.tipoOperacao === 'agendamento' ? 'Sua consulta foi agendada com sucesso. Detalhes: ' + JSON.stringify($json.agendamento) : 'Sua consulta foi cancelada. Detalhes: ' + JSON.stringify($json.agendamento) }}",
+        "message": "={{ $json.tipoOperacao === 'agendamento' ? 'Olá! Sua consulta com ' + $json.agendamento.doctorName + ' (' + $json.agendamento.specialty + ') foi confirmada para o dia ' + $json.agendamento.date.split('-').reverse().join('/') + ' às ' + $json.agendamento.startTime + '. Até lá!' : 'Olá! Sua consulta com ' + $json.agendamento.doctorName + ' (' + $json.agendamento.specialty + ') do dia ' + $json.agendamento.date.split('-').reverse().join('/') + ' às ' + $json.agendamento.startTime + ' foi cancelada com sucesso.' }}",
         "options": {}
       },
       "type": "n8n-nodes-base.gmail",
