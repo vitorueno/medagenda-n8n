@@ -29,6 +29,7 @@ export interface BookByDetailsParams {
 export interface CancelByPatientParams {
   patientId: number;
   date?: string;
+  startTime?: string;
 }
 
 export interface AppointmentDependencies {
@@ -126,16 +127,23 @@ export function createAppointmentService(deps: AppointmentDependencies) {
     },
     cancelByPatient(params: CancelByPatientParams): AppointmentRow {
       const active = deps.appointmentRepository.findActiveByPatient(params.patientId);
-      const candidates = params.date
-        ? active.filter((appointment) => {
-            const slot = deps.slotRepository.findById(appointment.slot_id);
-            return slot?.date === params.date;
-          })
-        : active;
+      const candidates = active.filter((appointment) => {
+        const slot = deps.slotRepository.findById(appointment.slot_id);
+        if (!slot) {
+          return false;
+        }
+        if (params.date && slot.date !== params.date) {
+          return false;
+        }
+        if (params.startTime && slot.start_time !== params.startTime) {
+          return false;
+        }
+        return true;
+      });
 
-      const identifier = params.date
-        ? `patient ${params.patientId} on ${params.date}`
-        : `patient ${params.patientId}`;
+      const identifier = [`patient ${params.patientId}`, params.date, params.startTime]
+        .filter(Boolean)
+        .join(' ');
 
       if (candidates.length > 1) {
         throw new MultipleActiveAppointmentsError(identifier);

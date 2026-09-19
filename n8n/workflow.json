@@ -692,7 +692,7 @@
     },
     {
       "parameters": {
-        "toolDescription": "Cancela a consulta ativa de um paciente. Informe date apenas se o paciente tiver mais de uma consulta ativa e for preciso desambiguar. Retorna a consulta cancelada ou um erro se não houver consulta ativa (ou houver mais de uma sem desambiguação suficiente).",
+        "toolDescription": "Cancela a consulta ativa de um paciente. Informe date e/ou startTime se o paciente tiver mais de uma consulta ativa e for preciso desambiguar (ex.: duas consultas no mesmo dia com médicos diferentes). Retorna a consulta cancelada ou um erro se não houver consulta ativa (ou houver mais de uma sem desambiguação suficiente).",
         "method": "POST",
         "url": "={{ $env.N8N_API_BASE_URL }}/appointments/cancel-by-patient",
         "sendHeaders": true,
@@ -714,6 +714,10 @@
             {
               "name": "date",
               "valueProvider": "modelOptional"
+            },
+            {
+              "name": "startTime",
+              "valueProvider": "modelOptional"
             }
           ]
         },
@@ -727,6 +731,10 @@
             {
               "name": "date",
               "description": "data da consulta a cancelar no formato YYYY-MM-DD, use somente se o paciente tiver mais de uma consulta ativa"
+            },
+            {
+              "name": "startTime",
+              "description": "horário de início da consulta a cancelar no formato HH:MM, use se o paciente tiver mais de uma consulta ativa no mesmo dia"
             }
           ]
         }

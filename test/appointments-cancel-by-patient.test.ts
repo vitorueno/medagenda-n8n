@@ -54,6 +54,48 @@ describe('POST /appointments/cancel-by-patient', () => {
     await app.close();
   });
 
+  it('disambiguates by startTime when two active appointments fall on the same date', async () => {
+    const { app, seed, env } = buildTestApp();
+
+    // patientIds[1] already has slotIds[1] (same date, 10:00) booked from the
+    // seed; booking slotIds[0] too gives them two active appointments on the
+    // same day, which date alone can't tell apart.
+    await app.inject({
+      method: 'POST',
+      url: '/appointments',
+      headers: authHeaders(env),
+      payload: { patientId: seed.patientIds[1], slotId: seed.slotIds[0] },
+    });
+
+    const ambiguous = await app.inject({
+      method: 'POST',
+      url: '/appointments/cancel-by-patient',
+      headers: authHeaders(env),
+      payload: { patientId: seed.patientIds[1], date: seed.dates[0] },
+    });
+    expect(ambiguous.statusCode).toBe(422);
+
+    const disambiguated = await app.inject({
+      method: 'POST',
+      url: '/appointments/cancel-by-patient',
+      headers: authHeaders(env),
+      payload: { patientId: seed.patientIds[1], date: seed.dates[0], startTime: '09:00' },
+    });
+    expect(disambiguated.statusCode).toBe(200);
+    expect(disambiguated.json()).toMatchObject({ slotId: seed.slotIds[0], status: 'cancelled' });
+
+    const remaining = await app.inject({
+      method: 'POST',
+      url: '/appointments/cancel-by-patient',
+      headers: authHeaders(env),
+      payload: { patientId: seed.patientIds[1], date: seed.dates[0], startTime: '10:00' },
+    });
+    expect(remaining.statusCode).toBe(200);
+    expect(remaining.json()).toMatchObject({ slotId: seed.slotIds[1], status: 'cancelled' });
+
+    await app.close();
+  });
+
   it('frees the cancelled slot back into availability', async () => {
     const { app, seed, env } = buildTestApp();
 

@@ -39,6 +39,10 @@ export const cancelByPatientBodySchema = z
       .string()
       .regex(/^\d{4}-\d{2}-\d{2}$/, 'date must be in YYYY-MM-DD format')
       .optional(),
+    startTime: z
+      .string()
+      .regex(/^\d{2}:\d{2}$/, 'startTime must be in HH:MM format')
+      .optional(),
   })
   .strict();
 
