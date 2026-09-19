@@ -1,5 +1,5 @@
 import type { DoctorRepository, DoctorRow } from './doctor.repository';
-import { normalizeName } from '../../shared/normalize';
+import { normalizeName, normalizeText } from '../../shared/normalize';
 import { DoctorAmbiguousError, DoctorNotFoundError } from '../../shared/errors';
 
 export interface ResolveDoctorParams {
@@ -22,7 +22,8 @@ export function createDoctorService(repository: DoctorRepository) {
       }
 
       if (params.specialty) {
-        candidates = candidates.filter((doctor) => doctor.specialty === params.specialty);
+        const normalized = normalizeText(params.specialty);
+        candidates = candidates.filter((doctor) => normalizeText(doctor.specialty) === normalized);
       }
 
       const identifier = params.name ?? params.specialty ?? 'unspecified';

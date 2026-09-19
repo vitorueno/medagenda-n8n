@@ -33,12 +33,28 @@ describe('GET /availability', () => {
     const { app, env } = buildTestApp();
     const response = await app.inject({
       method: 'GET',
-      url: '/availability?date=2026-09-21&specialty=dermatology',
+      url: '/availability?date=2026-09-21&specialty=dermatologia',
       headers: authHeaders(env),
     });
 
     expect(response.statusCode).toBe(200);
     expect(response.json()).toHaveLength(1);
+    await app.close();
+  });
+
+  it('matches a specialty regardless of case and accents', async () => {
+    const { app, env } = buildTestApp();
+
+    for (const specialty of ['Dermatologia', 'DERMATOLOGIA', 'dermatológia']) {
+      const response = await app.inject({
+        method: 'GET',
+        url: `/availability?date=2026-09-21&specialty=${encodeURIComponent(specialty)}`,
+        headers: authHeaders(env),
+      });
+      expect(response.statusCode).toBe(200);
+      expect(response.json()).toHaveLength(1);
+    }
+
     await app.close();
   });
 

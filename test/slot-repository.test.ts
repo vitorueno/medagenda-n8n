@@ -33,7 +33,7 @@ describe('slotRepository', () => {
     const { repository, seed } = setup();
     const slots = repository.findAvailable({ date: seed.dates[0] as string });
     expect(slots).toHaveLength(1);
-    expect(slots[0]).toMatchObject({ date: seed.dates[0], specialty: 'cardiology' });
+    expect(slots[0]).toMatchObject({ date: seed.dates[0], specialty: 'cardiologia' });
   });
 
   it('filters by doctorId', () => {
@@ -49,7 +49,7 @@ describe('slotRepository', () => {
     const { repository, seed } = setup();
     const slots = repository.findAvailable({
       date: seed.dates[1] as string,
-      specialty: 'dermatology',
+      specialty: 'dermatologia',
     });
     expect(slots).toHaveLength(1);
   });

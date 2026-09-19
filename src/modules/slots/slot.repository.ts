@@ -1,4 +1,5 @@
 import type Database from 'better-sqlite3';
+import { normalizeText } from '../../shared/normalize';
 
 export interface SlotRow {
   id: number;
@@ -47,11 +48,6 @@ export function createSlotRepository(db: Database.Database) {
         params.push(filters.doctorId);
       }
 
-      if (filters.specialty !== undefined) {
-        conditions.push('d.specialty = ?');
-        params.push(filters.specialty);
-      }
-
       const query = `
         SELECT s.id as id, d.id as doctorId, d.name as doctorName, d.specialty as specialty,
                s.date as date, s.start_time as startTime, s.end_time as endTime
@@ -61,7 +57,16 @@ export function createSlotRepository(db: Database.Database) {
         ORDER BY s.start_time ASC
       `;
 
-      return db.prepare(query).all(...params) as AvailableSlotView[];
+      const slots = db.prepare(query).all(...params) as AvailableSlotView[];
+
+      if (filters.specialty === undefined) {
+        return slots;
+      }
+
+      // Patients type the specialty the way they say it ("Dermatologia"), so it
+      // is matched case- and accent-insensitively rather than by SQL equality.
+      const normalized = normalizeText(filters.specialty);
+      return slots.filter((slot) => normalizeText(slot.specialty) === normalized);
     },
   };
 }

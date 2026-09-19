@@ -17,18 +17,18 @@ describe('doctorService.resolveDoctor', () => {
   it('resolves by exact name', () => {
     const service = buildService();
     const doctor = service.resolveDoctor({ name: 'Dra. Carla Mendes' });
-    expect(doctor.specialty).toBe('cardiology');
+    expect(doctor.specialty).toBe('cardiologia');
   });
 
   it('resolves regardless of accents, case, or "Dr./Dra." prefix', () => {
     const service = buildService();
     const doctor = service.resolveDoctor({ name: 'diego alves' });
-    expect(doctor.specialty).toBe('dermatology');
+    expect(doctor.specialty).toBe('dermatologia');
   });
 
   it('resolves by specialty when no name is given', () => {
     const service = buildService();
-    const doctor = service.resolveDoctor({ specialty: 'dermatology' });
+    const doctor = service.resolveDoctor({ specialty: 'Dermatológia' });
     expect(doctor.name).toBe('Dr. Diego Alves');
   });
 
@@ -43,10 +43,10 @@ describe('doctorService.resolveDoctor', () => {
     seedDatabase(db);
     db.prepare('INSERT INTO doctors (name, specialty) VALUES (?, ?)').run(
       'Dr. Bruno Cardoso',
-      'cardiology',
+      'cardiologia',
     );
     const service = createDoctorService(createDoctorRepository(db));
 
-    expect(() => service.resolveDoctor({ specialty: 'cardiology' })).toThrow(DoctorAmbiguousError);
+    expect(() => service.resolveDoctor({ specialty: 'cardiologia' })).toThrow(DoctorAmbiguousError);
   });
 });

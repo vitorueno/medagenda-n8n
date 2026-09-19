@@ -16,7 +16,7 @@ describe('POST /appointments/cancel-by-patient', () => {
       patientId: seed.patientIds[1],
       status: 'cancelled',
       doctorName: 'Dra. Carla Mendes',
-      specialty: 'cardiology',
+      specialty: 'cardiologia',
       date: '2026-09-20',
       startTime: '10:00',
       endTime: '10:30',

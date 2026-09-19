@@ -22,7 +22,7 @@ describe('POST /appointments/by-details', () => {
       slotId: seed.slotIds[2],
       status: 'active',
       doctorName: 'Dr. Diego Alves',
-      specialty: 'dermatology',
+      specialty: 'dermatologia',
       date: '2026-09-21',
       startTime: '14:00',
       endTime: '14:30',
@@ -38,7 +38,7 @@ describe('POST /appointments/by-details', () => {
       headers: authHeaders(env),
       payload: {
         patientId: seed.patientIds[0],
-        specialty: 'dermatology',
+        specialty: 'dermatologia',
         date: '2026-09-21',
         startTime: '14:00',
       },

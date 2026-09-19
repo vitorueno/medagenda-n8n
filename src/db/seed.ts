@@ -51,8 +51,8 @@ export function seedDatabase(db: Database.Database, options: SeedOptions = {}): 
   ];
 
   const doctorIds = [
-    Number(insertDoctor.run('Dra. Carla Mendes', 'cardiology').lastInsertRowid),
-    Number(insertDoctor.run('Dr. Diego Alves', 'dermatology').lastInsertRowid),
+    Number(insertDoctor.run('Dra. Carla Mendes', 'cardiologia').lastInsertRowid),
+    Number(insertDoctor.run('Dr. Diego Alves', 'dermatologia').lastInsertRowid),
   ];
 
   const slotIds = [

@@ -13,7 +13,7 @@ describe('GET /doctors', () => {
     expect(response.statusCode).toBe(200);
     const body = response.json() as Array<{ name: string; specialty: string }>;
     expect(body).toHaveLength(2);
-    expect(body.map((doctor) => doctor.specialty).sort()).toEqual(['cardiology', 'dermatology']);
+    expect(body.map((doctor) => doctor.specialty).sort()).toEqual(['cardiologia', 'dermatologia']);
     await app.close();
   });
 

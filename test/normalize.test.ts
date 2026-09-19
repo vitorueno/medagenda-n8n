@@ -1,5 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { normalizeName } from '../src/shared/normalize';
+import { normalizeName, normalizeText } from '../src/shared/normalize';
+
+describe('normalizeText', () => {
+  it('lowercases, trims, strips accents and collapses whitespace', () => {
+    expect(normalizeText('  Dermatológia  ')).toBe('dermatologia');
+    expect(normalizeText('CARDIOLOGIA')).toBe('cardiologia');
+    expect(normalizeText('clinica   geral')).toBe('clinica geral');
+  });
+
+  it('keeps a "Dr."/"Dra." prefix, unlike normalizeName', () => {
+    expect(normalizeText('Dr. Diego Alves')).toBe('dr. diego alves');
+  });
+});
 
 describe('normalizeName', () => {
   it('lowercases and trims', () => {
