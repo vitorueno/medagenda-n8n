@@ -35,7 +35,8 @@ Vem sempre de uma chamada real à API.
 
 ## Demonstração
 
-<video src="docs/evidencias/fluxo_completo.mp4" controls width="100%"></video>
+▶️ [**Assista à demonstração completa**](docs/evidencias/fluxo_completo.mp4)
+(o link abre o player de vídeo do próprio GitHub)
 
 Fluxo de conversa completo: consulta de horário, agendamento, checagem de
 preços e cancelamento, incluindo interação por áudio. Também mostra o envio
