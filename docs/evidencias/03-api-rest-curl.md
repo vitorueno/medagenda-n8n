@@ -12,7 +12,7 @@ D2=2026-09-21
 
 ## Autenticacao
 
-### Health check — rota publica, dispensa API key
+### Health check (rota publica, dispensa API key)
 
 ```bash
 curl -s -i -X GET "$BASE_URL/health"

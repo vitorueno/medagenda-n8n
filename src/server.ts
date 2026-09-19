@@ -37,7 +37,7 @@ export function buildApp(deps: BuildAppDeps): FastifyInstance {
 
   void app.register(swagger, {
     openapi: {
-      info: { title: 'Essentia Medical API', version: '1.0.0' },
+      info: { title: 'Assistente de Agendamento Medico - API', version: '1.0.0' },
       components: {
         securitySchemes: {
           apiKey: {

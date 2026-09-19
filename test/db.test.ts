@@ -38,7 +38,7 @@ describe('migrate', () => {
 
 describe('createDatabase', () => {
   it('creates the parent directory when it does not exist yet', () => {
-    const tempDir = join(tmpdir(), `essentia-test-${Date.now()}`);
+    const tempDir = join(tmpdir(), `medagenda-test-${Date.now()}`);
     const dbPath = join(tempDir, 'nested', 'dev.db');
 
     expect(existsSync(dbPath)).toBe(false);

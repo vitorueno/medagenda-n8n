@@ -23,13 +23,13 @@ aparece como `$API_KEY` nas transcrições.
 
 | Critério do enunciado                                          | Onde está a evidência                                                                              |
 | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| **Banco de dados** — modelagem simples, dados consistentes      | `03` (respostas com dados do seed), `01` (testes de migração, seed e repositórios)                  |
-| **Estrutura da API** — endpoints bem definidos                  | `03` (todos os endpoints, sucesso e erro), Swagger em `http://localhost:3000/docs`                    |
-| **Integração com N8N** — fluxo claro, uso correto de nodes      | `04` (conversa real), `01` (18 testes que validam a estrutura do `n8n/workflow.json`)                  |
-| **Tratamento multimodal** — texto vs. áudio                     | `01` (testes que verificam os ramos de áudio/texto do workflow); demonstração em vídeo no `05`        |
-| **Integração externa** — Gmail e TTS                            | `04` (o e-mail de confirmação dispara no fluxo); demonstração em vídeo no `05`                        |
-| **Documentação** — instalação, execução e teste                 | `README.md` na raiz do repositório                                                                     |
-| **Organização** — versionamento, modularização                  | histórico de commits (conventional commits, hook de pre-commit rodando lint + testes)                  |
+| **Banco de dados**: modelagem simples, dados consistentes      | `03` (respostas com dados do seed), `01` (testes de migração, seed e repositórios)                  |
+| **Estrutura da API**: endpoints bem definidos                  | `03` (todos os endpoints, sucesso e erro), Swagger em `http://localhost:3000/docs`                    |
+| **Integração com N8N**: fluxo claro, uso correto de nodes      | `04` (conversa real), `01` (18 testes que validam a estrutura do `n8n/workflow.json`)                  |
+| **Tratamento multimodal**: texto vs. áudio                     | `01` (testes que verificam os ramos de áudio/texto do workflow); demonstração em vídeo no `05`        |
+| **Integração externa**: Gmail e TTS                            | `04` (o e-mail de confirmação dispara no fluxo); demonstração em vídeo no `05`                        |
+| **Documentação**: instalação, execução e teste                 | `README.md` na raiz do repositório                                                                     |
+| **Organização**: versionamento, modularização                  | histórico de commits (conventional commits, hook de pre-commit rodando lint + testes)                  |
 
 ## Diferenciais do enunciado
 
@@ -50,4 +50,4 @@ npx eslint . && npx tsc --noEmit      # reproduz 02
 ```
 
 Para `03` e `04` é preciso importar o workflow no N8N e configurar as
-credenciais — o passo a passo está no `README.md` da raiz.
+credenciais. O passo a passo está no `README.md` da raiz.
